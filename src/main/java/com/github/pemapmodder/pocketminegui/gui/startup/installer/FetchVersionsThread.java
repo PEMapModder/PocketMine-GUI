@@ -1,20 +1,5 @@
 package com.github.pemapmodder.pocketminegui.gui.startup.installer;
 
-import lombok.Getter;
-import org.apache.commons.io.IOUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-
 /*
  * This file is part of PocketMine-GUI.
  *
@@ -31,6 +16,22 @@ import java.util.List;
  * You should have received a copy of the GNU Lesser General Public License
  * along with PocketMine-GUI.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import lombok.Getter;
+import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+
 public class FetchVersionsThread extends Thread{
 	@Getter
 	private ChooseVersionCard card;
