@@ -1,5 +1,5 @@
 language: java
 sudo: false
 install: ["mvn validate", "mvn dependency:resolve"]
-script: mvn license:check package
+script: mvn package
 jdk: [oraclejdk8]

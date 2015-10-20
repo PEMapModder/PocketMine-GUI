@@ -1,12 +1,5 @@
 package com.github.pemapmodder.pocketminegui.lib;
 
-import com.github.pemapmodder.pocketminegui.PocketMineGUI;
-import lombok.Getter;
-
-import javax.swing.JFrame;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
 /*
  * This file is part of PocketMine-GUI.
  *
@@ -23,6 +16,14 @@ import java.awt.event.WindowEvent;
  * You should have received a copy of the GNU Lesser General Public License
  * along with PocketMine-GUI.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import com.github.pemapmodder.pocketminegui.PocketMineGUI;
+import lombok.Getter;
+
+import javax.swing.JFrame;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 public abstract class Activity extends JFrame{
 	@Getter
 	private Activity parent, child = null;

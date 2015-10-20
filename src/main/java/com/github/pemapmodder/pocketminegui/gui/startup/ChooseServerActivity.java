@@ -1,16 +1,5 @@
 package com.github.pemapmodder.pocketminegui.gui.startup;
 
-import com.github.pemapmodder.pocketminegui.gui.server.ServerMainActivity;
-import com.github.pemapmodder.pocketminegui.gui.startup.installer.InstallServerActivity;
-import com.github.pemapmodder.pocketminegui.lib.Activity;
-
-import javax.swing.*;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-
 /*
  * This file is part of PocketMine-GUI.
  *
@@ -27,6 +16,18 @@ import java.io.File;
  * You should have received a copy of the GNU Lesser General Public License
  * along with PocketMine-GUI.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import com.github.pemapmodder.pocketminegui.gui.server.ServerMainActivity;
+import com.github.pemapmodder.pocketminegui.gui.startup.installer.InstallServerActivity;
+import com.github.pemapmodder.pocketminegui.lib.Activity;
+
+import javax.swing.*;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+
 public class ChooseServerActivity extends Activity{
 	public ChooseServerActivity(){
 		super("PocketMine-GUI");
