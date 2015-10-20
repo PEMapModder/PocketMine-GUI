@@ -19,8 +19,27 @@ package com.github.pemapmodder.pocketminegui.gui.startup.installer;
 
 import com.github.pemapmodder.pocketminegui.lib.card.Card;
 
+import javax.swing.JLabel;
+
 public class ChooseVersionCard extends Card{
+	private InstallServerActivity activity;
+
 	public ChooseVersionCard(InstallServerActivity activity){
+		this.activity = activity;
+		add(new JLabel("Loading..."));
+	}
+
+	@Override
+	public void onEntry(){
+		activity.getNextButton().setText("Install");
+		activity.validate();
+	}
+
+	@Override
+	public boolean onExit(int type){
+		activity.getNextButton().setText("Next");
+		activity.validate();
+		return true;
 	}
 
 	@Override

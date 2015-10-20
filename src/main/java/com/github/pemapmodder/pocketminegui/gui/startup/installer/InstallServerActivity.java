@@ -21,8 +21,16 @@ package com.github.pemapmodder.pocketminegui.gui.startup.installer;
 import com.github.pemapmodder.pocketminegui.lib.Activity;
 import com.github.pemapmodder.pocketminegui.lib.card.Card;
 import com.github.pemapmodder.pocketminegui.lib.card.CardActivity;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.io.File;
 
 public class InstallServerActivity extends CardActivity{
+	@Getter
+	@Setter
+	private File selectedHome;
+
 	public InstallServerActivity(Activity parent){
 		super("Install server", parent);
 	}
