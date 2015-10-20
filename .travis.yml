@@ -1,5 +1,5 @@
 language: java
 sudo: false
 install: ["mvn validate", "mvn dependency:resolve"]
-script: mvn package
+script: "mvn package | egrep -vi 'download(ing|ed)'"
 jdk: [oraclejdk8]
