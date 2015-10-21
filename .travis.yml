@@ -1,6 +1,8 @@
 language: java
 sudo: false
-install: mvn package > /dev/null # pre-run the script to install plugins
-after_install: rm -r target; ls
+install:
+  - mvn package > /dev/null # pre-run the script to install plugins
+  - rm -r target # clean directory
+  - ls # testing
 script: mvn package
 jdk: [oraclejdk8]
