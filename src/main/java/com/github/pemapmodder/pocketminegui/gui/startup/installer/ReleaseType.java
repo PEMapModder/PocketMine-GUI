@@ -19,19 +19,24 @@ package com.github.pemapmodder.pocketminegui.gui.startup.installer;
 
 import lombok.Getter;
 
+import java.awt.event.KeyEvent;
+
 public enum ReleaseType{
-	STABLE("Stable", Release.LIST_STABLE),
-	BETA("Beta", Release.LIST_BETA),
-	DEVELOPMENT("Deveopment", Release.LIST_DEVELOPMENT),
-	BLEEDING("Bleeding", Release.LIST_BLEEDING);
+	STABLE("Stable", Release.LIST_STABLE, KeyEvent.VK_S),
+	BETA("Beta", Release.LIST_BETA, KeyEvent.VK_B),
+	DEVELOPMENT("Deveopment", Release.LIST_DEVELOPMENT, KeyEvent.VK_D),
+	BLEEDING("Bleeding", Release.LIST_BLEEDING, KeyEvent.VK_L);
 
 	@Getter
-	private String name;
+	private final String name;
 	@Getter
-	private int typeId;
+	private final int typeId;
+	@Getter
+	private final int keyMap;
 
-	ReleaseType(String name, int typeId){
+	ReleaseType(String name, int typeId, int keyMap){
 		this.name = name;
 		this.typeId = typeId;
+		this.keyMap = keyMap;
 	}
 }

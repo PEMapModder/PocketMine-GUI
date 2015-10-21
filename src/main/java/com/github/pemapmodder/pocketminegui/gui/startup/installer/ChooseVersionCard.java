@@ -22,9 +22,8 @@ import lombok.Getter;
 
 import javax.swing.*;
 import java.awt.CardLayout;
-import java.awt.event.ActionEvent;
+import java.awt.GridLayout;
 import java.util.List;
-import java.util.Vector;
 
 public class ChooseVersionCard extends Card{
 	private InstallServerActivity activity;
@@ -34,12 +33,15 @@ public class ChooseVersionCard extends Card{
 	private int nextIndex = 0;
 	@Getter
 	private Timer timer;
-	private JList[] lists = new JList[ReleaseType.values().length];
-	private Vector[] listsData = new Vector[ReleaseType.values().length];
 	private ButtonGroup typeRadios;
+	private final JLabel loadingLabel;
 	private JPanel cardPanel;
 	private CardLayout cardLayout;
 	private int choosenType = ReleaseType.STABLE.getTypeId();
+	private JList[] lists = new JList[ReleaseType.values().length];
+	private DefaultListModel[] listModels = new DefaultListModel[ReleaseType.values().length];
+	@Getter
+	private Release selectedRelease = null;
 
 	public ChooseVersionCard(InstallServerActivity activity){
 		this.activity = activity;
@@ -47,35 +49,46 @@ public class ChooseVersionCard extends Card{
 		JPanel radioPanel = new JPanel();
 		cardPanel = new JPanel(cardLayout = new CardLayout());
 		for(ReleaseType type : ReleaseType.values()){
-			JRadioButton button = new JRadioButton();
+			JRadioButton button = new JRadioButton(type.getName());
+			if(type == ReleaseType.STABLE){
+				button.setSelected(true);
+			}
 			button.addActionListener(e -> onRadioClicked(type));
 			typeRadios.add(button);
 			radioPanel.add(button);
 			int id = type.getTypeId();
-			Vector<String> data = new Vector<>();
-			listsData[id] = data;
-			JList<String> list = new JList<>(data);
-			lists[id] = list;
 			JScrollPane pane = new JScrollPane();
-			pane.add(lists[id]);
+			DefaultListModel<Release> model = new DefaultListModel<>();
+			listModels[type.getTypeId()] = model;
+			JList<String> list = new JList<>();
+			list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			list.addListSelectionListener(e -> {
+				Release release = model.get(list.getSelectedIndex());
+				activity.setSelectedRelease(release);
+				activity.getNextButton().setEnabled(true);
+			});
+			pane.getViewport().add(lists[type.getTypeId()] = list);
 			cardPanel.add(pane, type.getName());
 		}
 		cardLayout.show(cardPanel, ReleaseType.STABLE.getName());
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		add(radioPanel);
+		add(loadingLabel = new JLabel("Loading..."));
 		add(cardPanel);
 
 		versionFetch = new FetchVersionsThread(this);
 		versionFetch.start();
-		timer = new Timer(100, this::updateVersions);
+		timer = new Timer(100, e -> updateVersions());
 		timer.start();
 	}
 
 	private void onRadioClicked(ReleaseType type){
 		cardLayout.show(cardPanel, type.getName());
 		choosenType = type.getTypeId();
+		activity.getNextButton().setEnabled(lists[choosenType].getSelectedIndex() != -1);
 	}
 
-	private void updateVersions(ActionEvent event){
+	private void updateVersions(){
 		List<Release> releases = versionFetch.getReleases();
 		int size = releases.size();
 		for(int i = nextIndex; i < size; i++){
@@ -87,24 +100,26 @@ public class ChooseVersionCard extends Card{
 			if(timer != null){
 				timer.stop();
 				timer = null;
+				loadingLabel.setText("");
 			}
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private void addRelease(Release release){
-		listsData[release.getType().getTypeId()].addElement(release.presentInHtml());
-		lists[release.getType().getTypeId()].setListData(listsData[release.getType().getTypeId()]);
-		revalidate();
-	}
-
-	public Release getSelectedRelease(){
-		return versionFetch.getReleases().get(lists[choosenType].getSelectedIndex());
+	private void addRelease(final Release release){
+		int id = release.getType().getTypeId();
+		listModels[id].addElement(release);
+		lists[id].setModel(listModels[id]);
+		lists[id].revalidate();
+		lists[id].repaint();
+//		revalidate();
+//		repaint();
 	}
 
 	@Override
 	public void onEntry(){
 		activity.getNextButton().setText("Install");
+		activity.getNextButton().setEnabled(false);
 		activity.revalidate();
 	}
 
@@ -112,6 +127,7 @@ public class ChooseVersionCard extends Card{
 	public boolean onExit(int type){
 		activity.getNextButton().setText("Next");
 		activity.revalidate();
+		activity.getNextButton().setEnabled(true);
 		return true;
 	}
 

@@ -1,4 +1,4 @@
-package com.github.pemapmodder.pocketminegui.gui.startup.installer;
+package com.github.pemapmodder.pocketminegui.utils;
 
 /*
  * This file is part of PocketMine-GUI.
@@ -17,35 +17,40 @@ package com.github.pemapmodder.pocketminegui.gui.startup.installer;
  * along with PocketMine-GUI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-import com.github.pemapmodder.pocketminegui.lib.Activity;
-import com.github.pemapmodder.pocketminegui.lib.card.Card;
-import com.github.pemapmodder.pocketminegui.lib.card.CardActivity;
 import lombok.Getter;
-import lombok.Setter;
 
-import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.ByteBuffer;
 
-public class InstallServerActivity extends CardActivity{
+public class GetUrlThread extends Thread{
+	private final static int STEP = 256;
+
+	private URL url;
 	@Getter
-	@Setter
-	private File selectedHome;
+	private int progress = 0, max = 0;
 
-	@Getter
-	@Setter
-	private Release selectedRelease;
+	public ByteBuffer bb;
 
-	public InstallServerActivity(Activity parent){
-		super("Install server", parent);
+	public GetUrlThread(URL url){
+		this.url = url;
 	}
 
 	@Override
-	public Card[] getDefaultCards(){
-		return new Card[]{
-				new ChooseLocationCard(this),
-				new ChooseVersionCard(this),
-				new DownloadProgressCard(this),
-				new ServerSetupCard(this)
-		};
+	public void run(){
+		try{
+			InputStream is = url.openStream();
+			max = is.available();
+			bb = ByteBuffer.allocate(max);
+			for(progress = 0; progress < max; progress = Math.min(progress + STEP, max)){
+				int read = Math.min(max - progress, STEP);
+				byte[] buffer = new byte[read];
+				bb.put(buffer);
+			}
+			is.close();
+		}catch(IOException e){
+			e.printStackTrace();
+		}
 	}
 }

@@ -18,9 +18,68 @@ package com.github.pemapmodder.pocketminegui.gui.startup.installer;
  */
 
 import com.github.pemapmodder.pocketminegui.lib.card.Card;
+import com.github.pemapmodder.pocketminegui.utils.GetUrlThread;
+
+import javax.swing.JProgressBar;
+import javax.swing.Timer;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class DownloadProgressCard extends Card{
+	private InstallServerActivity activity;
+	private JProgressBar progressBar;
+	private boolean maxSet = false;
+	private Timer progressCheck;
+	private GetUrlThread thread;
+
 	public DownloadProgressCard(InstallServerActivity activity){
+		this.activity = activity;
+		progressBar = new JProgressBar();
+	}
+
+	@Override
+	public void onEntry(){
+		activity.getBackButton().setEnabled(false);
+		activity.getNextButton().setEnabled(false);
+		URL url;
+		try{
+			url = new URL(activity.getSelectedRelease().getPharUrl());
+		}catch(MalformedURLException e){
+			e.printStackTrace();
+			return;
+		}
+		thread = new GetUrlThread(url);
+		progressCheck = new Timer(100, ev -> {
+			if(thread.getMax() > 0){
+				if(!maxSet){
+					progressBar.setMaximum(thread.getMax());
+				}
+				progressBar.setValue(thread.getProgress());
+				if(thread.getMax() == thread.getProgress()){
+					progressCheck.stop();
+					byte[] data = thread.bb.array();
+					File home = activity.getSelectedHome();
+					try{
+						if(!home.mkdirs()){
+							throw new IOException("Cannot make directories");
+						}
+						File phar = new File(home, "PocketMine-MP.phar");
+						OutputStream os = new FileOutputStream(phar);
+						os.write(data);
+						os.close();
+					}catch(IOException e){
+						e.printStackTrace();
+					}
+					activity.getNextButton().setEnabled(true);
+					revalidate();
+				}
+			}
+		});
+		progressCheck.start();
 	}
 
 	@Override

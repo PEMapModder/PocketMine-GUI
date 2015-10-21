@@ -20,10 +20,11 @@ package com.github.pemapmodder.pocketminegui.lib.card;
 import com.github.pemapmodder.pocketminegui.lib.Activity;
 import lombok.Getter;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import java.awt.CardLayout;
-import java.awt.GridLayout;
+import java.awt.event.KeyEvent;
 
 public abstract class CardActivity extends Activity{
 	@Getter
@@ -48,7 +49,7 @@ public abstract class CardActivity extends Activity{
 	@Override
 	protected void onStart(){
 		cards = getDefaultCards();
-		setLayout(new GridLayout(2, 1));
+		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
 		CardLayout cardLayout = new CardLayout();
 		swapper = new JPanel(cardLayout);
@@ -62,7 +63,9 @@ public abstract class CardActivity extends Activity{
 		backButton = new JButton("Back");
 		nextButton = new JButton("Next");
 		backButton.addActionListener(e -> back());
+		backButton.setMnemonic(KeyEvent.VK_B);
 		nextButton.addActionListener(e -> next());
+		nextButton.setMnemonic(KeyEvent.VK_N);
 		controls.add(backButton);
 		controls.add(nextButton);
 

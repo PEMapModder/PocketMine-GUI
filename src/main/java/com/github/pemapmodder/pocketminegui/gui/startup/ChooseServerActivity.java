@@ -63,7 +63,7 @@ public class ChooseServerActivity extends Activity{
 						"Invalid selection", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			if(!new File(home, "PocketMine-MP.phar").isFile() && !new File(home, "src").isDirectory()){
+			if(!new File(home, "PocketMine-MP.phar").isFile() || !new File(home, "src").isDirectory()){
 				JOptionPane.showMessageDialog(ChooseServerActivity.this, "Could not find a phar or " +
 						"source installation of PocketMine-MP in directory! " +
 						"Please click the \"Install server into new directory\" button " +

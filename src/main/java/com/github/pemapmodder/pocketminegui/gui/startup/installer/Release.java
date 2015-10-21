@@ -43,7 +43,8 @@ public class Release{
 		this.zipEntryName = zipEntryName;
 	}
 
-	public String presentInHtml(){
+	@Override
+	public String toString(){
 		return "<html><strong>" + name + "</strong><br>" + "<table><tr>" +
 				"<td align='left'>" + type.getName() + " version</td><td align='right'>" +
 				new SimpleDateFormat("YYYY-MM-dd HH:mm:ss z").format(new Date(publishTime)) +

@@ -18,11 +18,75 @@ package com.github.pemapmodder.pocketminegui.gui.server;
  */
 
 import com.github.pemapmodder.pocketminegui.lib.Activity;
+import lombok.Getter;
 
+import javax.swing.JMenuBar;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class ServerMainActivity extends Activity{
+	private Process process;
+	private OutputStream stdin;
+	private InputStream stdout, stderr;
+
+	@Getter
+	private ServerState serverState = ServerState.STATE_STOPPED;
+	private File home;
+	private File phpBinaries, pmEntry;
+
 	public ServerMainActivity(File home){
 		super("PocketMine-GUI @ " + home.getAbsolutePath());
+		this.home = home;
+		phpBinaries = new File(home, "bin/php/php");
+		pmEntry = new File(home, "PocketMine-MP.phar");
+		if(!pmEntry.isFile()){
+			pmEntry = new File(home, "src");
+			assert pmEntry.isDirectory();
+		}
+	}
+
+	@Override
+	protected void onStart(){
+		JMenuBar bar = new JMenuBar();
+		setJMenuBar(bar);
+	}
+
+	public boolean startServer(){
+		if(serverState != ServerState.STATE_STOPPED){
+			return false;
+		}
+
+		try{
+			setProcess(new ProcessBuilder
+					(phpBinaries.getAbsolutePath(), pmEntry.getAbsolutePath(), "--disable-ansi")
+					.directory(home)
+					.start());
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		return true;
+	}
+
+	public void setProcess(Process process){
+		this.process = process;
+		stdin = process.getOutputStream();
+		stdout = process.getInputStream();
+		stderr = process.getErrorStream();
+	}
+
+	public enum ServerState{
+		STATE_STOPPED("Stopped"),
+		STATE_STARTING("Starting"),
+		STATE_RUNNING("Running"),
+		STATE_STOPPING("Stopping");
+
+		@Getter
+		private String state;
+
+		ServerState(String state){
+			this.state = state;
+		}
 	}
 }

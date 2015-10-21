@@ -102,27 +102,30 @@ public abstract class Activity extends JFrame{
 		if(child != null){
 			child.stopActivity();
 		}
-		onStopCalled = true;
-		onStop();
 		dispose();
+		onClose0();
+	}
+
+	private void onClose0(){
+		if(!onStopCalled){
+			onStopCalled = true;
+			onStop();
+		}
+		if(hasParent()){
+			parent.onChildClosed();
+			parent.requestFocus();
+		}else{
+			PocketMineGUI.CURRENT_ROOT_ACTIVITY = null;
+			if(!hasNewActivity){
+				System.exit(0);
+			}
+		}
 	}
 
 	private class InternalWindowListener extends WindowAdapter{
 		@Override
 		public void windowClosed(WindowEvent e){
-			if(!onStopCalled){
-				onStopCalled = true;
-				onStop();
-			}
-			if(hasParent()){
-				parent.onChildClosed();
-				parent.requestFocus();
-			}else{
-				PocketMineGUI.CURRENT_ROOT_ACTIVITY = null;
-				if(!hasNewActivity){
-					System.exit(0);
-				}
-			}
+			onClose0();
 		}
 
 		@Override
