@@ -3,6 +3,5 @@ sudo: false
 install:
   - mvn package > /dev/null # pre-run the script to install plugins
   - rm -r target # clean directory
-  - ls # testing
 script: mvn package
 jdk: [oraclejdk8]
