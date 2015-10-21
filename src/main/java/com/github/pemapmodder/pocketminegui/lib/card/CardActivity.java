@@ -95,7 +95,7 @@ public abstract class CardActivity extends Activity{
 			setTitle(String.format("Step %d of %d: %s", currentStep + 1, cards.length, newCard.getCardName()));
 			nextButton.setText(currentStep + 1 == cards.length ? "Finish" : "Next");
 			backButton.setEnabled(currentStep > 0);
-			validate();
+			revalidate();
 			pack();
 		}
 	}
@@ -104,6 +104,9 @@ public abstract class CardActivity extends Activity{
 	protected void onStop(){
 		if(currentStep != -1){
 			cards[currentStep].onExit(Card.EXIT_CLOSE);
+		}
+		for(Card card : cards){
+			card.onStop();
 		}
 	}
 }

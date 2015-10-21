@@ -50,7 +50,8 @@ public class ChooseLocationCard extends Card implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e){
 		JFileChooser chooser = new JFileChooser(new File("."));
-		int result = chooser.showSaveDialog(this);
+		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		int result = chooser.showDialog(this, "Choose");
 		if(result == JFileChooser.APPROVE_OPTION){
 			File file = chooser.getSelectedFile();
 			pathField.setText(file.getAbsolutePath());

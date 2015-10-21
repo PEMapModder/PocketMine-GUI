@@ -1,4 +1,4 @@
-package com.github.pemapmodder.pocketminegui.lib.card;
+package com.github.pemapmodder.pocketminegui.gui.startup.installer;
 
 /*
  * This file is part of PocketMine-GUI.
@@ -17,37 +17,21 @@ package com.github.pemapmodder.pocketminegui.lib.card;
  * along with PocketMine-GUI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import javax.swing.JPanel;
+import lombok.Getter;
 
-public abstract class Card extends JPanel{
-	/**
-	 * The {@link CardActivity} is closed.
-	 */
-	public final static int EXIT_CLOSE = 0;
-	/**
-	 * The "Back" button is triggered.
-	 */
-	public final static int EXIT_BACK = 1;
-	/**
-	 * The "Next" button is triggered.
-	 */
-	public final static int EXIT_NEXT = 2;
+public enum ReleaseType{
+	STABLE("Stable", Release.LIST_STABLE),
+	BETA("Beta", Release.LIST_BETA),
+	DEVELOPMENT("Deveopment", Release.LIST_DEVELOPMENT),
+	BLEEDING("Bleeding", Release.LIST_BLEEDING);
 
-	public void onEntry(){
-	}
+	@Getter
+	private String name;
+	@Getter
+	private int typeId;
 
-	/**
-	 * Triggered when card is swapped
-	 *
-	 * @param type one of {@link #EXIT_CLOSE}, {@link #EXIT_BACK} and {@link #EXIT_NEXT}
-	 * @return whether to allow this action
-	 */
-	public boolean onExit(int type){
-		return true;
-	}
-
-	public abstract String getCardName();
-
-	public void onStop(){
+	ReleaseType(String name, int typeId){
+		this.name = name;
+		this.typeId = typeId;
 	}
 }

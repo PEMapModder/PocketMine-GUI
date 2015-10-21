@@ -37,6 +37,8 @@ public class FetchVersionsThread extends Thread{
 	private ChooseVersionCard card;
 	@Getter
 	private final List<Release> releases = new ArrayList<>();
+	@Getter
+	private boolean done = false;
 
 	public FetchVersionsThread(ChooseVersionCard card){
 		this.card = card;
@@ -45,95 +47,85 @@ public class FetchVersionsThread extends Thread{
 	@Override
 	public void run(){
 		fetchGitHubReleases();
-
+		fetchJenkinsBuilds("http://jenkins.pocketmine.net/job/PocketMine-MP/api/json?depth=1", "dev", ReleaseType.DEVELOPMENT);
+		fetchJenkinsBuilds("http://jenkins.pocketmine.net/job/PocketMine-MP-Bleeding/api/json?depth=1", "bleeding", ReleaseType.BLEEDING);
+		done = true;
 	}
 
 	private void fetchGitHubReleases(){
 		try{
 			URL url = new URL("https://api.github.com/repos/PocketMine/PocketMine-MP/releases");
-			try{
-				String jsonString = IOUtils.toString(url);
-				try{
-					JSONArray releasesArray = new JSONArray(jsonString);
-					for(Object object : releasesArray){
-						JSONObject jo = (JSONObject) object;
-						DateFormat date = new SimpleDateFormat("YYYY-MM-DDTHH:MM:SSZ");
-						JSONArray assets = jo.getJSONArray("assets");
-						String pharUrl = null;
-						for(Object asset : assets){
-							JSONObject assetObject = (JSONObject) asset;
-							if(assetObject.getString("name").endsWith(".phar")){
-								pharUrl = assetObject.getString("name");
-							}
-						}
-						if(pharUrl == null){
-							continue;
-						}
-						Release release = new Release(
-								jo.getString("tag_name"),
-								jo.getBoolean("prerelease") ? Release.ReleaseType.PRE_RELEASE : Release.ReleaseType.RELEASE,
-								date.parse(jo.getString("published_at")).getTime(),
-								pharUrl
-						);
-						synchronized(releases){
-							releases.add(release);
-						}
+			String jsonString = IOUtils.toString(url);
+			JSONArray releasesArray = new JSONArray(jsonString);
+			for(Object object : releasesArray){
+				JSONObject jo = (JSONObject) object;
+				DateFormat date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+				JSONArray assets = jo.getJSONArray("assets");
+				String pharUrl = null;
+				for(Object asset : assets){
+					JSONObject assetObject = (JSONObject) asset;
+					if(assetObject.getString("name").endsWith(".phar")){
+						pharUrl = assetObject.getString("name");
 					}
-				}catch(JSONException | ParseException e){
-					e.printStackTrace();
 				}
-			}catch(IOException e){
-				e.printStackTrace();
+				if(pharUrl == null){
+					continue;
+				}
+				Release release = new Release(
+						jo.getString("tag_name"),
+						jo.getBoolean("prerelease") ? ReleaseType.BETA : ReleaseType.STABLE,
+						date.parse(jo.getString("published_at")).getTime(),
+						pharUrl, null
+				);
+				synchronized(releases){
+					releases.add(release);
+				}
 			}
-		}catch(MalformedURLException e){
+		}catch(IOException e){
+			e.printStackTrace();
+		}catch(NullPointerException | ClassCastException | JSONException | ParseException e){
+			System.err.println("GitHub API returned invalid value!");
 			e.printStackTrace();
 		}
 	}
 
-	private void fetchDevBuilds(){
+	private void fetchJenkinsBuilds(String urlPath, String buildPrefix, ReleaseType releaseType){
 		try{
-			URL url = new URL("http://jenkins.pocketmine.net/job/PocketMine-MP/api/json");
-
-			try{
-				String jsonString = IOUtils.toString(url);
-				try{
-					JSONObject object = new JSONObject(jsonString);
-					JSONArray array = object.getJSONArray("builds");
-
-				}catch(JSONException e){
-					e.printStackTrace();
+			URL url = new URL(urlPath);
+			String jsonString = IOUtils.toString(url);
+			JSONObject object = new JSONObject(jsonString);
+			JSONArray array = object.getJSONArray("builds");
+			for(Object arrayObject : array){
+				JSONObject build = (JSONObject) arrayObject;
+				if(!build.getString("result").equals("SUCCESS")){
+					continue;
 				}
-			}catch(IOException e){
-				e.printStackTrace();
+				String artifactName = null;
+				for(Object artifactObject : build.getJSONArray("artifacts")){
+					JSONObject artifact = (JSONObject) artifactObject;
+					if(artifact.getString("fileName").endsWith(".phar")){
+						artifactName = artifact.getString("relativePath");
+					}
+				}
+				if(artifactName == null){
+					continue;
+				}
+				Release release = new Release(
+						buildPrefix + "-" + build.getInt("number"),
+						releaseType,
+						build.getLong("timestamp"),
+						build.getString("url") + artifactName, null
+				);
+				synchronized(releases){
+					releases.add(release);
+				}
 			}
 		}catch(MalformedURLException e){
+			e.printStackTrace();
+		}catch(IOException | JSONException | NullPointerException | ClassCastException e){
+			System.err.println("Jenkins API returned invalid value!");
 			e.printStackTrace();
 		}
 	}
 
-	public static class Release{
-		@Getter
-		private String name;
-		@Getter
-		private ReleaseType type;
-		@Getter
-		private long publishTime;
-		@Getter
-		private String pharUrl;
-
-		public Release(String name, ReleaseType type, long publishTime, String pharUrl){
-			this.name = name;
-			this.type = type;
-			this.publishTime = publishTime;
-			this.pharUrl = pharUrl;
-		}
-
-		public enum ReleaseType{
-			RELEASE,
-			PRE_RELEASE,
-			DEVELOPMENT,
-			BLEEDING,
-			KATANA
-		}
-	}
 }

@@ -70,6 +70,7 @@ public abstract class Activity extends JFrame{
 	}
 
 	protected void onChildClosed(){
+		child = null;
 	}
 
 	public boolean hasParent(){
