@@ -28,36 +28,48 @@
 	<version>1.0-SNAPSHOT</version>
 
 	<dependencies>
+		<!-- lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>1.16.6</version>
 			<scope>provided</scope>
 		</dependency>
+		<!-- apache commons -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.3.2</version>
 		</dependency>
+		<!-- json-simple -->
 		<dependency>
 			<groupId>com.googlecode.json-simple</groupId>
 			<artifactId>json-simple</artifactId>
 			<version>1.1</version>
 		</dependency>
+		<!-- apache commons io -->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>2.4</version>
 		</dependency>
+		<!-- org.json -->
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>20150729</version>
 		</dependency>
+		<!-- snakeyaml -->
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<version>1.16</version>
+		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
+			<!-- compiler -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -68,6 +80,7 @@
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
+			<!-- javadoc -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
@@ -76,6 +89,7 @@
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
+			<!-- license -->
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
@@ -92,6 +106,7 @@
 						<exclude>**/LICENSE</exclude>
 						<exclude>src/test/resources/**</exclude>
 						<exclude>src/main/resources/**</exclude>
+						<exclude>PocketMine-MP/**</exclude>
 					</excludes>
 				</configuration>
 				<executions>
@@ -103,6 +118,7 @@
 					</execution>
 				</executions>
 			</plugin>
+			<!-- shade -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -126,6 +142,7 @@
 					</execution>
 				</executions>
 			</plugin>
+			<!-- exec -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>

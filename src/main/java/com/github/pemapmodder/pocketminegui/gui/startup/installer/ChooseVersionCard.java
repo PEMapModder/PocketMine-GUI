@@ -22,7 +22,6 @@ import lombok.Getter;
 
 import javax.swing.*;
 import java.awt.CardLayout;
-import java.awt.GridLayout;
 import java.util.List;
 
 public class ChooseVersionCard extends Card{
@@ -56,7 +55,7 @@ public class ChooseVersionCard extends Card{
 			button.addActionListener(e -> onRadioClicked(type));
 			typeRadios.add(button);
 			radioPanel.add(button);
-			int id = type.getTypeId();
+//			int id = type.getTypeId();
 			JScrollPane pane = new JScrollPane();
 			DefaultListModel<Release> model = new DefaultListModel<>();
 			listModels[type.getTypeId()] = model;

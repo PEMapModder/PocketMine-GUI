@@ -119,3 +119,5 @@ local.properties
 # TeXlipse plugin
 .texlipse
 
+# Custom
+PocketMine-MP/*
