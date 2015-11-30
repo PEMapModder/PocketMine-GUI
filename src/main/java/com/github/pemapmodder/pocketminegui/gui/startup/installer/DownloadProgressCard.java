@@ -38,7 +38,7 @@ public class DownloadProgressCard extends Card{
 
 	public DownloadProgressCard(InstallServerActivity activity){
 		this.activity = activity;
-		progressBar = new JProgressBar();
+		add(progressBar = new JProgressBar());
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class DownloadProgressCard extends Card{
 					File home = activity.getSelectedHome();
 					try{
 						if(!home.mkdirs()){
-							throw new IOException("Cannot make directories");
+//							throw new IOException("Cannot make directories");
 						}
 						File phar = new File(home, "PocketMine-MP.phar");
 						OutputStream os = new FileOutputStream(phar);
@@ -80,6 +80,7 @@ public class DownloadProgressCard extends Card{
 			}
 		});
 		progressCheck.start();
+		thread.start();
 	}
 
 	@Override

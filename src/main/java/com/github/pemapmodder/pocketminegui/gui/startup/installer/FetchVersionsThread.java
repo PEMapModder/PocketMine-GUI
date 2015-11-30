@@ -114,7 +114,7 @@ public class FetchVersionsThread extends Thread{
 						buildPrefix + "-" + build.getInt("number"),
 						releaseType,
 						build.getLong("timestamp"),
-						build.getString("url") + artifactName, null
+						build.getString("url") + "artifact/" + artifactName, null
 				);
 				synchronized(releases){
 					releases.add(release);

@@ -58,4 +58,10 @@ public class ChooseLocationCard extends Card implements ActionListener{
 			activity.pack();
 		}
 	}
+
+	@Override
+	public boolean onExit(int type){
+		activity.setSelectedHome(new File(pathField.getText()));
+		return super.onExit(type);
+	}
 }
