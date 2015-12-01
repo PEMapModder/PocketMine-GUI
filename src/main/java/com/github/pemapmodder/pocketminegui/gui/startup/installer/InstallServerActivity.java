@@ -37,6 +37,7 @@ public class InstallServerActivity extends CardActivity{
 
 	public InstallServerActivity(Activity parent){
 		super("Install server", parent);
+		setExtendedState(MAXIMIZED_BOTH);
 	}
 
 	@Override
@@ -47,5 +48,11 @@ public class InstallServerActivity extends CardActivity{
 				new DownloadProgressCard(this),
 				new ServerSetupCard(this)
 		};
+	}
+
+	@Override
+	protected void setCard(int index, int exitType){
+		super.setCard(index, exitType);
+		setExtendedState(MAXIMIZED_BOTH);
 	}
 }

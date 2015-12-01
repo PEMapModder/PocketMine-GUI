@@ -1,4 +1,4 @@
-package com.github.pemapmodder.pocketminegui.gui.startup.installer;
+package com.github.pemapmodder.pocketminegui.gui.startup.config.adaptor;
 
 /*
  * This file is part of PocketMine-GUI.
@@ -20,24 +20,14 @@ package com.github.pemapmodder.pocketminegui.gui.startup.installer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import javax.swing.JCheckBox;
 
 @AllArgsConstructor
-public class Release{
-	public final static int LIST_STABLE = 0, LIST_BETA = 1, LIST_DEVELOPMENT = 2, LIST_BLEEDING = 3;
-
-	@Getter private String name;
-	@Getter private ReleaseType type;
-	@Getter private long publishTime;
-	@Getter private String pharUrl;
-	private String zipEntryName;
+public class CheckBoxOptionAdaptor implements OptionAdaptor<Boolean>{
+	@Getter private JCheckBox checkBox;
 
 	@Override
-	public String toString(){
-		return "<html><strong>" + name + "</strong><br>" + "<table><tr>" +
-				"<td align='left'>" + type.getName() + " version</td><td align='right'>" +
-				new SimpleDateFormat("YYYY-MM-dd HH:mm:ss z").format(new Date(publishTime)) +
-				"</td></tr></table></html>";
+	public Boolean getOption(){
+		return checkBox.isSelected();
 	}
 }

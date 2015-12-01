@@ -111,8 +111,6 @@ public class ChooseVersionCard extends Card{
 		lists[id].setModel(listModels[id]);
 		lists[id].revalidate();
 		lists[id].repaint();
-//		revalidate();
-//		repaint();
 	}
 
 	@Override

@@ -65,7 +65,7 @@ public class FetchVersionsThread extends Thread{
 				for(Object asset : assets){
 					JSONObject assetObject = (JSONObject) asset;
 					if(assetObject.getString("name").endsWith(".phar")){
-						pharUrl = assetObject.getString("name");
+						pharUrl = assetObject.getString("browser_download_url");
 					}
 				}
 				if(pharUrl == null){

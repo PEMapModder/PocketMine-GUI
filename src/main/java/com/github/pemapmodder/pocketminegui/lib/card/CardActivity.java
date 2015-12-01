@@ -86,7 +86,7 @@ public abstract class CardActivity extends Activity{
 		setCard(currentStep - 1, Card.EXIT_BACK);
 	}
 
-	private void setCard(int index, int exitType){
+	protected void setCard(int index, int exitType){
 		if(index >= cards.length){
 			throw new IndexOutOfBoundsException("No such card");
 		}

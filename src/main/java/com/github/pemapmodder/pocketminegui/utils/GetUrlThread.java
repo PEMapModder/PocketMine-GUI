@@ -40,13 +40,16 @@ public class GetUrlThread extends Thread{
 	@Override
 	public void run(){
 		try{
+			System.out.println("Downloading: " + url);
 			InputStream is = url.openStream();
 			max = is.available();
 			bb = ByteBuffer.allocate(max);
 			for(progress = 0; progress < max; progress = Math.min(progress + STEP, max)){
 				int read = Math.min(max - progress, STEP);
 				byte[] buffer = new byte[read];
+				is.read(buffer);
 				bb.put(buffer);
+				System.out.println(progress);
 			}
 			is.close();
 		}catch(IOException e){
