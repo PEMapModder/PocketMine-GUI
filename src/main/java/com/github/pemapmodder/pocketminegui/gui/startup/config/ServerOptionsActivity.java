@@ -38,6 +38,8 @@ public abstract class ServerOptionsActivity extends Activity{
 
 	@Getter private OptionAdaptor<?> adaptor;
 
+	private int lastSelected = -1;
+
 	public ServerOptionsActivity(String title, Activity activity, Map<String, Object> map, Map<String, String> descMap){
 		super(title, activity);
 		values = map;
@@ -56,9 +58,7 @@ public abstract class ServerOptionsActivity extends Activity{
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setSize(list.getWidth(), 300);
 		list.addListSelectionListener(e -> onSelect(list.getSelectedIndex()));
-		for(String key : values.keySet()){
-			model.addElement(key);
-		}
+		values.keySet().forEach(model::addElement);
 		list.setModel(model);
 		list.revalidate();
 		list.repaint();
@@ -74,6 +74,13 @@ public abstract class ServerOptionsActivity extends Activity{
 	}
 
 	private void onSelect(int index){
+		if(lastSelected == index){
+			return;
+		}
+		if(lastSelected != -1){
+			onDeselect(lastSelected);
+		}
+		lastSelected = index;
 		String key = (String) values.keySet().toArray()[index];
 		descLabel.setText(descMap.get(key));
 		editorPanel.removeAll();
@@ -100,6 +107,11 @@ public abstract class ServerOptionsActivity extends Activity{
 		}else{
 			adaptor = () -> value;
 		}
+	}
+
+	private void onDeselect(int lastSelected){
+		String key = (String) values.keySet().toArray()[lastSelected];
+		values.put(key, adaptor.getOption());
 	}
 
 	@Override
