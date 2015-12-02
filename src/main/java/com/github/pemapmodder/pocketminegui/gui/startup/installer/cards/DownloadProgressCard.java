@@ -65,7 +65,7 @@ public class DownloadProgressCard extends Card{
 				}
 				progressBar.setValue(thread.getProgress());
 				progressLabel.setText(Math.round(thread.getProgress() / 102.4) / 10 + "KB / " +
-						Math.round(thread.getMax() / 1024.0) / 10 + "KB");
+						Math.round(thread.getMax() / 102.4) / 10 + "KB");
 				if(thread.getMax() == thread.getProgress()){
 					progressCheck.stop();
 					byte[] data = thread.bb.array();
