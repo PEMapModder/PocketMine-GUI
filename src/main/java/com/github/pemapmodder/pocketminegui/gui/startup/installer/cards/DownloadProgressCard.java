@@ -21,6 +21,7 @@ import com.github.pemapmodder.pocketminegui.gui.startup.installer.InstallServerA
 import com.github.pemapmodder.pocketminegui.lib.card.Card;
 import com.github.pemapmodder.pocketminegui.utils.GetUrlThread;
 
+import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.Timer;
 import java.io.File;
@@ -33,13 +34,16 @@ import java.net.URL;
 public class DownloadProgressCard extends Card{
 	private InstallServerActivity activity;
 	private JProgressBar progressBar;
+	private JLabel progressLabel;
 	private boolean maxSet = false;
 	private Timer progressCheck;
 	private GetUrlThread thread;
 
 	public DownloadProgressCard(InstallServerActivity activity){
 		this.activity = activity;
+		add(new JLabel("Downloading... "));
 		add(progressBar = new JProgressBar());
+		add(progressLabel = new JLabel());
 	}
 
 	@Override
@@ -60,6 +64,8 @@ public class DownloadProgressCard extends Card{
 					progressBar.setMaximum(thread.getMax());
 				}
 				progressBar.setValue(thread.getProgress());
+				progressLabel.setText(Math.round(thread.getProgress() / 102.4) / 10 + "KB / " +
+						Math.round(thread.getMax() / 1024.0) / 10 + "KB");
 				if(thread.getMax() == thread.getProgress()){
 					progressCheck.stop();
 					byte[] data = thread.bb.array();

@@ -49,7 +49,6 @@ public class GetUrlThread extends Thread{
 				byte[] buffer = new byte[read];
 				is.read(buffer);
 				bb.put(buffer);
-				System.out.println(progress);
 			}
 			is.close();
 		}catch(IOException e){
