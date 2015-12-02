@@ -35,7 +35,7 @@ import java.util.List;
 
 public class FetchVersionsThread extends Thread{
 	@Getter
-	private ChooseVersionCard card;
+	private final ChooseVersionCard card;
 	@Getter
 	private final List<Release> releases = new ArrayList<>();
 	@Getter

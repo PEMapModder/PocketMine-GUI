@@ -26,8 +26,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 public class ChooseLocationCard extends Card implements ActionListener{
-	private JTextField pathField;
-	private InstallServerActivity activity;
+	private final JTextField pathField;
+	private final InstallServerActivity activity;
 
 	public ChooseLocationCard(InstallServerActivity activity){
 		this.activity = activity;

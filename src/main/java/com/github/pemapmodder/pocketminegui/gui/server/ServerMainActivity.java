@@ -20,6 +20,7 @@ package com.github.pemapmodder.pocketminegui.gui.server;
 import com.github.pemapmodder.pocketminegui.lib.Activity;
 import lombok.Getter;
 
+import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import java.awt.event.KeyEvent;
@@ -33,10 +34,12 @@ public class ServerMainActivity extends Activity{
 	private OutputStream stdin;
 	private InputStream stdout, stderr;
 
-	@Getter
-	private ServerState serverState = ServerState.STATE_STOPPED;
+	@Getter private ServerState serverState = ServerState.STATE_STOPPED;
 	private File home;
 	private File phpBinaries, pmEntry;
+
+	@Getter private JButton startStopButton;
+	@Getter private ConsolePanel consolePanel;
 
 	public ServerMainActivity(File home){
 		super("PocketMine-GUI @ " + home.getAbsolutePath());
@@ -54,12 +57,13 @@ public class ServerMainActivity extends Activity{
 		JMenuBar bar = new JMenuBar();
 		JMenu serverMenu = new JMenu("Server");
 		serverMenu.setMnemonic(KeyEvent.VK_S);
-		JMenu playerMenu = new JMenu("Player");
+		JMenu playerMenu = new JMenu("Players");
 		playerMenu.setMnemonic(KeyEvent.VK_P);
 		bar.add(serverMenu);
 		bar.add(playerMenu);
 		setJMenuBar(bar);
-
+		add(startStopButton = new JButton("Start"));
+		add(consolePanel = new ConsolePanel(this));
 	}
 
 	public boolean startServer(){
@@ -72,6 +76,9 @@ public class ServerMainActivity extends Activity{
 					(phpBinaries.getAbsolutePath(), pmEntry.getAbsolutePath(), "--disable-ansi")
 					.directory(home)
 					.start());
+			serverState = ServerState.STATE_STARTING;
+			startStopButton.setEnabled(false);
+			startStopButton.setText(serverState.getState());
 		}catch(IOException e){
 			e.printStackTrace();
 		}
@@ -93,12 +100,11 @@ public class ServerMainActivity extends Activity{
 
 	public enum ServerState{
 		STATE_STOPPED("Stopped"),
-		STATE_STARTING("Starting"),
+		STATE_STARTING("Starting..."),
 		STATE_RUNNING("Running"),
-		STATE_STOPPING("Stopping");
+		STATE_STOPPING("Stopping...");
 
-		@Getter
-		private String state;
+		@Getter private String state;
 
 		ServerState(String state){
 			this.state = state;

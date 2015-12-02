@@ -32,9 +32,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class DownloadProgressCard extends Card{
-	private InstallServerActivity activity;
-	private JProgressBar progressBar;
-	private JLabel progressLabel;
+	private final InstallServerActivity activity;
+	private final JProgressBar progressBar;
+	private final JLabel progressLabel;
 	private boolean maxSet = false;
 	private Timer progressCheck;
 	private GetUrlThread thread;
@@ -62,6 +62,7 @@ public class DownloadProgressCard extends Card{
 			if(thread.getMax() > 0){
 				if(!maxSet){
 					progressBar.setMaximum(thread.getMax());
+					maxSet = true;
 				}
 				progressBar.setValue(thread.getProgress());
 				progressLabel.setText(Math.round(thread.getProgress() / 102.4) / 10.0 + "KB / " +

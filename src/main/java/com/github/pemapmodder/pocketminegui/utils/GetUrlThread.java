@@ -27,7 +27,7 @@ import java.nio.ByteBuffer;
 public class GetUrlThread extends Thread{
 	private final static int STEP = 256;
 
-	private URL url;
+	private final URL url;
 	@Getter
 	private int progress = 0, max = 0;
 

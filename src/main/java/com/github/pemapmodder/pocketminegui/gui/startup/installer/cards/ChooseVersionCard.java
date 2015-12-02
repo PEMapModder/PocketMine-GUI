@@ -29,20 +29,20 @@ import java.awt.CardLayout;
 import java.util.List;
 
 public class ChooseVersionCard extends Card{
-	private InstallServerActivity activity;
+	private final InstallServerActivity activity;
 	@Getter
-	private FetchVersionsThread versionFetch;
+	private final FetchVersionsThread versionFetch;
 	@Getter
 	private int nextIndex = 0;
 	@Getter
 	private Timer timer;
-	private ButtonGroup typeRadios;
+	private final ButtonGroup typeRadios;
 	private final JLabel loadingLabel;
-	private JPanel cardPanel;
-	private CardLayout cardLayout;
+	private final JPanel cardPanel;
+	private final CardLayout cardLayout;
 	private int choosenType = ReleaseType.STABLE.getTypeId();
-	private JList[] lists = new JList[ReleaseType.values().length];
-	private DefaultListModel[] listModels = new DefaultListModel[ReleaseType.values().length];
+	private final JList[] lists = new JList[ReleaseType.values().length];
+	private final DefaultListModel[] listModels = new DefaultListModel[ReleaseType.values().length];
 	@Getter
 	private Release selectedRelease = null;
 
