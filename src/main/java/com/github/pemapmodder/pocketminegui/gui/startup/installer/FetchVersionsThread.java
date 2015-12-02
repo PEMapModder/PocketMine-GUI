@@ -17,6 +17,7 @@ package com.github.pemapmodder.pocketminegui.gui.startup.installer;
  * along with PocketMine-GUI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.github.pemapmodder.pocketminegui.gui.startup.installer.cards.ChooseVersionCard;
 import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;

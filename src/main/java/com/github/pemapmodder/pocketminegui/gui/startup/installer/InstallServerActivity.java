@@ -18,6 +18,11 @@ package com.github.pemapmodder.pocketminegui.gui.startup.installer;
  */
 
 
+import com.github.pemapmodder.pocketminegui.gui.server.ServerMainActivity;
+import com.github.pemapmodder.pocketminegui.gui.startup.installer.cards.ChooseLocationCard;
+import com.github.pemapmodder.pocketminegui.gui.startup.installer.cards.ChooseVersionCard;
+import com.github.pemapmodder.pocketminegui.gui.startup.installer.cards.DownloadProgressCard;
+import com.github.pemapmodder.pocketminegui.gui.startup.installer.cards.ServerSetupCard;
 import com.github.pemapmodder.pocketminegui.lib.Activity;
 import com.github.pemapmodder.pocketminegui.lib.card.Card;
 import com.github.pemapmodder.pocketminegui.lib.card.CardActivity;
@@ -54,5 +59,11 @@ public class InstallServerActivity extends CardActivity{
 	protected void setCard(int index, int exitType){
 		super.setCard(index, exitType);
 		setExtendedState(MAXIMIZED_BOTH);
+	}
+
+	@Override
+	protected void onFinish(){
+		super.onFinish();
+		getParent().initNewActivity(new ServerMainActivity(selectedHome));
 	}
 }

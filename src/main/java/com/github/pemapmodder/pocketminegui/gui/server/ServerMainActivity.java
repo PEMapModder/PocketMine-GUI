@@ -20,7 +20,9 @@ package com.github.pemapmodder.pocketminegui.gui.server;
 import com.github.pemapmodder.pocketminegui.lib.Activity;
 import lombok.Getter;
 
+import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,7 +52,14 @@ public class ServerMainActivity extends Activity{
 	@Override
 	protected void onStart(){
 		JMenuBar bar = new JMenuBar();
+		JMenu serverMenu = new JMenu("Server");
+		serverMenu.setMnemonic(KeyEvent.VK_S);
+		JMenu playerMenu = new JMenu("Player");
+		playerMenu.setMnemonic(KeyEvent.VK_P);
+		bar.add(serverMenu);
+		bar.add(playerMenu);
 		setJMenuBar(bar);
+
 	}
 
 	public boolean startServer(){
@@ -74,6 +83,12 @@ public class ServerMainActivity extends Activity{
 		stdin = process.getOutputStream();
 		stdout = process.getInputStream();
 		stderr = process.getErrorStream();
+	}
+
+	@Override
+	public void pack(){
+		super.pack();
+		setExtendedState(MAXIMIZED_BOTH);
 	}
 
 	public enum ServerState{

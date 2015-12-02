@@ -76,7 +76,7 @@ public abstract class CardActivity extends Activity{
 
 	public void next(){
 		if(currentStep + 1 == cards.length){
-			stopActivity();
+			onFinish();
 			return;
 		}
 		setCard(currentStep + 1, Card.EXIT_NEXT);
@@ -111,5 +111,9 @@ public abstract class CardActivity extends Activity{
 		for(Card card : cards){
 			card.onStop();
 		}
+	}
+
+	protected void onFinish(){
+		stopActivity();
 	}
 }

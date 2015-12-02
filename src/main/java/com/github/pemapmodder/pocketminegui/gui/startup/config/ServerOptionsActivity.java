@@ -18,15 +18,18 @@ package com.github.pemapmodder.pocketminegui.gui.startup.config;
  */
 
 import com.github.pemapmodder.pocketminegui.gui.startup.config.adaptor.CheckBoxOptionAdaptor;
+import com.github.pemapmodder.pocketminegui.gui.startup.config.adaptor.NumberFieldAdaptor;
 import com.github.pemapmodder.pocketminegui.gui.startup.config.adaptor.OptionAdaptor;
 import com.github.pemapmodder.pocketminegui.lib.Activity;
+import com.github.pemapmodder.pocketminegui.lib.JNumberFilter;
 import lombok.Getter;
 
 import javax.swing.*;
 import java.awt.GridLayout;
+import java.util.List;
 import java.util.Map;
 
-public class ServerOptionsActivity extends Activity{
+public abstract class ServerOptionsActivity extends Activity{
 	@Getter private final Map<String, Object> values;
 	@Getter private final Map<String, String> descMap;
 
@@ -81,9 +84,28 @@ public class ServerOptionsActivity extends Activity{
 			editorPanel.add(checkBox);
 			adaptor = new CheckBoxOptionAdaptor(checkBox);
 		}else if(value instanceof Number){
-			JTextField field = new JFormattedTextField();
+			JTextField field = new JTextField();
+			field.setSize(300, field.getHeight());
+			field.setDocument(new JNumberFilter().setNegativeAccepted(true));
+			editorPanel.add(field);
+			adaptor = new NumberFieldAdaptor(field);
 		}else if(value instanceof String){
 			JTextField field = new JTextField();
+			field.setSize(600, field.getHeight());
+			editorPanel.add(field);
+			adaptor = field::getText;
+		}else if(value instanceof List){
+			// TODO
+			adaptor = () -> (List) value;
+		}else{
+			adaptor = () -> value;
 		}
 	}
+
+	@Override
+	protected void onStop(){
+		onResult(values);
+	}
+
+	protected abstract void onResult(Map<String, Object> opts);
 }

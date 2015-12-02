@@ -1,4 +1,4 @@
-package com.github.pemapmodder.pocketminegui.gui.startup.installer;
+package com.github.pemapmodder.pocketminegui.gui.startup.installer.cards;
 
 /*
  * This file is part of PocketMine-GUI.
@@ -17,6 +17,10 @@ package com.github.pemapmodder.pocketminegui.gui.startup.installer;
  * along with PocketMine-GUI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.github.pemapmodder.pocketminegui.gui.startup.installer.FetchVersionsThread;
+import com.github.pemapmodder.pocketminegui.gui.startup.installer.InstallServerActivity;
+import com.github.pemapmodder.pocketminegui.gui.startup.installer.Release;
+import com.github.pemapmodder.pocketminegui.gui.startup.installer.ReleaseType;
 import com.github.pemapmodder.pocketminegui.lib.card.Card;
 import lombok.Getter;
 
