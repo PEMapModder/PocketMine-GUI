@@ -164,8 +164,10 @@ public class ServerSetupCard extends Card{
 					for(Map.Entry<String, Object> entry : opts.entrySet()){
 						writer.append(entry.getKey())
 								.append('=')
-								.append(entry.getValue().toString());
+								.append(entry.getValue().toString())
+								.append("\r\n");
 					}
+					writer.close();
 				}catch(IOException e1){
 					e1.printStackTrace();
 				}
@@ -178,9 +180,10 @@ public class ServerSetupCard extends Card{
 			protected void onResult(Map<String, Object> opts){
 				Yaml yaml = new Yaml();
 				try{
-					yaml.dump(convertPlainToNested(opts), new OutputStreamWriter(new FileOutputStream(
-							new File(activity.getSelectedHome(), "pocketmine.yml"))));
-				}catch(FileNotFoundException e1){
+					Writer writer = new OutputStreamWriter(new FileOutputStream(new File(activity.getSelectedHome(), "pocketmine.yml")));
+					yaml.dump(convertPlainToNested(opts), writer);
+					writer.close();
+				}catch(IOException e1){
 					e1.printStackTrace();
 				}
 			}
