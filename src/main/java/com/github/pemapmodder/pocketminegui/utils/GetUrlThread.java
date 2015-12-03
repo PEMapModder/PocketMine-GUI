@@ -17,19 +17,15 @@ package com.github.pemapmodder.pocketminegui.utils;
  * along with PocketMine-GUI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import lombok.Getter;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.ByteBuffer;
 
-public class GetUrlThread extends Thread{
+public class GetUrlThread extends AsyncTask{
 	private final static int STEP = 256;
 
 	private final URL url;
-	@Getter
-	private int progress = 0, max = 0;
 
 	public ByteBuffer bb;
 
@@ -42,10 +38,10 @@ public class GetUrlThread extends Thread{
 		try{
 			System.out.println("Downloading: " + url);
 			InputStream is = url.openStream();
-			max = is.available();
-			bb = ByteBuffer.allocate(max);
-			for(progress = 0; progress < max; progress = Math.min(progress + STEP, max)){
-				int read = Math.min(max - progress, STEP);
+			setMax(is.available());
+			bb = ByteBuffer.allocate(getMax());
+			for(setProgress(0); getProgress() < getMax(); setProgress(Math.min(getProgress() + STEP, getMax()))){
+				int read = Math.min(getMax() - getProgress(), STEP);
 				byte[] buffer = new byte[read];
 				is.read(buffer);
 				bb.put(buffer);

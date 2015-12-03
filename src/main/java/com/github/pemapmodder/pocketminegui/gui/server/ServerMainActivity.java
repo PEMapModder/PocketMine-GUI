@@ -41,10 +41,10 @@ public class ServerMainActivity extends Activity{
 	@Getter private JButton startStopButton;
 	@Getter private ConsolePanel consolePanel;
 
-	public ServerMainActivity(File home){
+	public ServerMainActivity(File home, File phpBinaries){
 		super("PocketMine-GUI @ " + home.getAbsolutePath());
 		this.home = home;
-		phpBinaries = new File(home, "bin/php/php");
+		this.phpBinaries = phpBinaries;
 		pmEntry = new File(home, "PocketMine-MP.phar");
 		if(!pmEntry.isFile()){
 			pmEntry = new File(home, "src");

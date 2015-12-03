@@ -20,6 +20,7 @@ package com.github.pemapmodder.pocketminegui.gui.startup;
 import com.github.pemapmodder.pocketminegui.gui.server.ServerMainActivity;
 import com.github.pemapmodder.pocketminegui.gui.startup.installer.InstallServerActivity;
 import com.github.pemapmodder.pocketminegui.lib.Activity;
+import com.github.pemapmodder.pocketminegui.utils.Utils;
 
 import javax.swing.*;
 import java.awt.Font;
@@ -29,6 +30,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 public class ChooseServerActivity extends Activity{
+
 	public ChooseServerActivity(){
 		super("PocketMine-GUI");
 	}
@@ -66,11 +68,36 @@ public class ChooseServerActivity extends Activity{
 			if(!new File(home, "PocketMine-MP.phar").isFile() && !new File(home, "src").isDirectory()){
 				JOptionPane.showMessageDialog(ChooseServerActivity.this, "Could not find a phar or " +
 						"source installation of PocketMine-MP in directory! " +
-						"Please click the \"Install server into new directory\" button " +
-						"if you wish to install a server there instead.", "Invalid selection", JOptionPane.ERROR_MESSAGE);
+						"Please click the \"Install server into new directory\" button if " +
+						"you wish to install a server there instead.", "Invalid selection", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			ServerMainActivity server = new ServerMainActivity(home);
+			File phpBinaries = new File("bin/php/php.exe");
+			if(!phpBinaries.isFile()){
+				phpBinaries = new File("bin/php5/bin/php");
+				if(!phpBinaries.isFile()){
+					JOptionPane.showMessageDialog(ChooseServerActivity.this, "Could not autodetect PHP binaries. " +
+									"Please choose the PHP binaries to run with this server.",
+							"Binaries not found", JOptionPane.WARNING_MESSAGE);
+					while(true){
+						JFileChooser binChooser = new JFileChooser(new File(
+								System.getProperty("os.name").toLowerCase().contains("win") ?
+										System.getenv("ProgramFiles") : "/Applications"));
+						binChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+						ret = binChooser.showOpenDialog(ChooseServerActivity.this);
+						if(ret != JFileChooser.APPROVE_OPTION){
+							return;
+						}
+						phpBinaries = binChooser.getSelectedFile();
+						if(Utils.validatePhpBinaries(phpBinaries)){
+							break;
+						}
+						JOptionPane.showMessageDialog(ChooseServerActivity.this, "Invalid PHP binaries! " +
+								"Please choose again.", "Invalid binaries", JOptionPane.ERROR_MESSAGE);
+					}
+				}
+			}
+			ServerMainActivity server = new ServerMainActivity(home, phpBinaries);
 			initNewActivity(server);
 		}
 	}

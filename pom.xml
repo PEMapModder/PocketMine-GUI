@@ -151,7 +151,6 @@
 				<configuration>
 					<mainClass>com.github.pemapmodder.pocketminegui.PocketMineGUI</mainClass>
 				</configuration>
-
 				<executions>
 					<execution>
 						<goals>

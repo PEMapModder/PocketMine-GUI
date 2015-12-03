@@ -32,13 +32,9 @@ import lombok.Setter;
 import java.io.File;
 
 public class InstallServerActivity extends CardActivity{
-	@Getter
-	@Setter
-	private File selectedHome;
+	@Getter @Setter private File selectedHome, phpBinaries;
 
-	@Getter
-	@Setter
-	private Release selectedRelease;
+	@Getter @Setter private Release selectedRelease;
 
 	public InstallServerActivity(Activity parent){
 		super("Install server", parent);
@@ -64,6 +60,6 @@ public class InstallServerActivity extends CardActivity{
 	@Override
 	protected void onFinish(){
 		super.onFinish();
-		getParent().initNewActivity(new ServerMainActivity(selectedHome));
+		getParent().initNewActivity(new ServerMainActivity(selectedHome, phpBinaries));
 	}
 }
