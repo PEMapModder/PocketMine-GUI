@@ -24,13 +24,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.regex.Pattern;
 
 import static com.github.pemapmodder.pocketminegui.utils.Utils.OperatingSystem.*;
 
 public class Utils{
-	private final static Pattern PHP_V_OUTPUT = Pattern.compile("^PHP [0-9]+\\.[0-9]+\\.[0-9]+", Pattern.MULTILINE);
-
 	public static interface InstallProgressReporter{
 		public void report(double fraction);
 		public void completed(File result);
@@ -92,7 +89,7 @@ public class Utils{
 	private static File installWindowsPHP(File home, InstallProgressReporter progress){
 		File bin = new File(home, ".pmgui_tmp_pm_windows_installer");
 		bin.mkdirs();
-			progress.report(0.0);
+		progress.report(0.0);
 		try{
 			URL url = new URL("https", "github.com", "PocketMine/PocketMine-MP/releases/download/1.4.1dev-936/PocketMine-MP_Installer_1.4.1dev-936_x86.exe");
 			File installerFile = new File(bin, "installer.exe");
@@ -134,7 +131,8 @@ public class Utils{
 			Process process = new ProcessBuilder(phpBinaries.getAbsolutePath(), "-v").start();
 			process.waitFor();
 			String output = new String(IOUtils.toByteArray(process.getInputStream()));
-			 return PHP_V_OUTPUT.matcher(output).matches();
+			System.out.println(output);
+			return output.startsWith("PHP ") && output.contains("The PHP Group");
 		}catch(IOException e){
 			e.printStackTrace();
 			return false;

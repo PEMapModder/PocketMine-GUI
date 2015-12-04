@@ -27,16 +27,13 @@ public enum ReleaseType{
 	DEVELOPMENT("Deveopment", Release.LIST_DEVELOPMENT, KeyEvent.VK_D),
 	BLEEDING("Bleeding", Release.LIST_BLEEDING, KeyEvent.VK_L);
 
-	@Getter
-	private final String name;
-	@Getter
-	private final int typeId;
-	@Getter
-	private final int keyMap;
+	@Getter private final String name;
+	@Getter private final int mnemonic;
+	@Getter private final int typeId;
 
-	ReleaseType(String name, int typeId, int keyMap){
+	ReleaseType(String name, int typeId, int mnemonic){
 		this.name = name;
 		this.typeId = typeId;
-		this.keyMap = keyMap;
+		this.mnemonic = mnemonic;
 	}
 }

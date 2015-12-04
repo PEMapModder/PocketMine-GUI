@@ -82,7 +82,7 @@ buildNumber.properties
 *.pydevproject
 .metadata
 .gradle
-bin/
+test/bin/
 tmp/
 *.tmp
 *.bak
@@ -120,4 +120,5 @@ local.properties
 .texlipse
 
 # Custom
-PocketMine-MP/*
+PocketMine-MP/
+test/

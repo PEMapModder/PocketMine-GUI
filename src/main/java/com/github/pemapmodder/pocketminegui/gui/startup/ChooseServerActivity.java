@@ -72,9 +72,9 @@ public class ChooseServerActivity extends Activity{
 						"you wish to install a server there instead.", "Invalid selection", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			File phpBinaries = new File("bin/php/php.exe");
+			File phpBinaries = new File(home, "bin/php/php.exe");
 			if(!phpBinaries.isFile()){
-				phpBinaries = new File("bin/php5/bin/php");
+				phpBinaries = new File(home, "bin/php5/bin/php");
 				if(!phpBinaries.isFile()){
 					JOptionPane.showMessageDialog(ChooseServerActivity.this, "Could not autodetect PHP binaries. " +
 									"Please choose the PHP binaries to run with this server.",

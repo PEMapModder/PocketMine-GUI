@@ -20,10 +20,11 @@ package com.github.pemapmodder.pocketminegui.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.ByteBuffer;
 
 public class GetUrlThread extends AsyncTask{
-	private final static int STEP = 256;
+	private final static int STEP = 1024;
 
 	private final URL url;
 
@@ -37,14 +38,17 @@ public class GetUrlThread extends AsyncTask{
 	public void run(){
 		try{
 			System.out.println("Downloading: " + url);
-			InputStream is = url.openStream();
-			setMax(is.available());
+			URLConnection conn = url.openConnection();
+			InputStream is = conn.getInputStream();
+			setMax(conn.getContentLength());
 			bb = ByteBuffer.allocate(getMax());
-			for(setProgress(0); getProgress() < getMax(); setProgress(Math.min(getProgress() + STEP, getMax()))){
-				int read = Math.min(getMax() - getProgress(), STEP);
-				byte[] buffer = new byte[read];
-				is.read(buffer);
-				bb.put(buffer);
+			for(setProgress(0); true; setProgress(Math.min(getProgress() + STEP, getMax()))){
+				byte[] buffer = new byte[STEP];
+				int len = is.read(buffer);
+				if(len == -1){
+					break;
+				}
+				bb.put(buffer, 0, len);
 			}
 			is.close();
 		}catch(IOException e){

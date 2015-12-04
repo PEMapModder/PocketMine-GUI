@@ -19,19 +19,38 @@ package com.github.pemapmodder.pocketminegui.gui.server;
 
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.Timer;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.io.BufferedReader;
+import java.io.IOException;
 
 public class ConsolePanel extends JPanel{
 	private final ServerMainActivity activity;
-	private final JTextArea console;
+	private final JTextArea stdout;
 
 	public ConsolePanel(ServerMainActivity activity){
 		this.activity = activity;
-		console = new JTextArea();
-		console.setEditable(false);
+		stdout = new JTextArea();
+		stdout.setEditable(false);
 		// people NEED to see this to feel happy
-		console.setForeground(Color.WHITE);
-		console.setBackground(Color.BLACK);
-		add(console);
+		stdout.setForeground(Color.WHITE);
+		stdout.setBackground(Color.BLACK);
+		stdout.setPreferredSize(new Dimension(getWidth(), getHeight()));
+		add(stdout);
+		Timer timer = new Timer(100, e -> updateConsole());
+		timer.start();
+	}
+
+	private void updateConsole(){
+		BufferedReader reader = activity.getStdoutBuffered();
+		if(reader == null){
+			return;
+		}
+		try{
+			System.out.println(reader.readLine());
+		}catch(IOException e){
+			e.printStackTrace();
+		}
 	}
 }

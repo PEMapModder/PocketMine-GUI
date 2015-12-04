@@ -53,6 +53,7 @@ public class ChooseVersionCard extends Card{
 		cardPanel = new JPanel(cardLayout = new CardLayout());
 		for(ReleaseType type : ReleaseType.values()){
 			JRadioButton button = new JRadioButton(type.getName());
+			button.setMnemonic(type.getMnemonic());
 			if(type == ReleaseType.STABLE){
 				button.setSelected(true);
 			}

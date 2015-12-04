@@ -19,10 +19,7 @@ package com.github.pemapmodder.pocketminegui.gui.startup.installer;
 
 
 import com.github.pemapmodder.pocketminegui.gui.server.ServerMainActivity;
-import com.github.pemapmodder.pocketminegui.gui.startup.installer.cards.ChooseLocationCard;
-import com.github.pemapmodder.pocketminegui.gui.startup.installer.cards.ChooseVersionCard;
-import com.github.pemapmodder.pocketminegui.gui.startup.installer.cards.DownloadProgressCard;
-import com.github.pemapmodder.pocketminegui.gui.startup.installer.cards.ServerSetupCard;
+import com.github.pemapmodder.pocketminegui.gui.startup.installer.cards.*;
 import com.github.pemapmodder.pocketminegui.lib.Activity;
 import com.github.pemapmodder.pocketminegui.lib.card.Card;
 import com.github.pemapmodder.pocketminegui.lib.card.CardActivity;
@@ -32,7 +29,8 @@ import lombok.Setter;
 import java.io.File;
 
 public class InstallServerActivity extends CardActivity{
-	@Getter @Setter private File selectedHome, phpBinaries;
+	@Getter private File selectedHome;
+	@Getter @Setter private File phpBinaries;
 
 	@Getter @Setter private Release selectedRelease;
 
@@ -47,8 +45,14 @@ public class InstallServerActivity extends CardActivity{
 				new ChooseLocationCard(this),
 				new ChooseVersionCard(this),
 				new DownloadProgressCard(this),
-				new ServerSetupCard(this)
+				new PhpInstallerCard(this),
+				new ServerSetupCard(this),
 		};
+	}
+
+	public void setSelectedHome(File selectedHome){
+		this.selectedHome = selectedHome;
+		selectedHome.mkdirs();
 	}
 
 	@Override

@@ -20,24 +20,23 @@ package com.github.pemapmodder.pocketminegui.gui.server;
 import com.github.pemapmodder.pocketminegui.lib.Activity;
 import lombok.Getter;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 public class ServerMainActivity extends Activity{
 	private Process process;
-	private OutputStream stdin;
-	private InputStream stdout, stderr;
+	@Getter private OutputStream stdin;
+	@Getter private InputStream stdout, stderr;
+	@Getter private BufferedReader stdoutBuffered;
 
 	@Getter private ServerState serverState = ServerState.STATE_STOPPED;
 	private File home;
-	private File phpBinaries, pmEntry;
 
+	private File phpBinaries, pmEntry;
 	@Getter private JButton startStopButton;
 	@Getter private ConsolePanel consolePanel;
 
@@ -48,12 +47,15 @@ public class ServerMainActivity extends Activity{
 		pmEntry = new File(home, "PocketMine-MP.phar");
 		if(!pmEntry.isFile()){
 			pmEntry = new File(home, "src");
-			assert pmEntry.isDirectory();
+			if(!pmEntry.isDirectory()){
+				throw new RuntimeException("No PocketMine entry detected");
+			}
 		}
 	}
 
 	@Override
 	protected void onStart(){
+		setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 		JMenuBar bar = new JMenuBar();
 		JMenu serverMenu = new JMenu("Server");
 		serverMenu.setMnemonic(KeyEvent.VK_S);
@@ -62,20 +64,25 @@ public class ServerMainActivity extends Activity{
 		bar.add(serverMenu);
 		bar.add(playerMenu);
 		setJMenuBar(bar);
-		add(startStopButton = new JButton("Start"));
+		startStopButton = new JButton("Start");
+		startStopButton.addActionListener(e -> startServer());
+		add(startStopButton);
 		add(consolePanel = new ConsolePanel(this));
 	}
 
 	public boolean startServer(){
+		System.out.println("Starting");
 		if(serverState != ServerState.STATE_STOPPED){
 			return false;
 		}
 
 		try{
+			System.out.println(phpBinaries.getAbsolutePath() + pmEntry.getAbsolutePath());
 			setProcess(new ProcessBuilder
-					(phpBinaries.getAbsolutePath(), pmEntry.getAbsolutePath(), "--disable-ansi")
+					(phpBinaries.getAbsolutePath(), pmEntry.getAbsolutePath())
 					.directory(home)
 					.start());
+
 			serverState = ServerState.STATE_STARTING;
 			startStopButton.setEnabled(false);
 			startStopButton.setText(serverState.getState());
@@ -89,6 +96,7 @@ public class ServerMainActivity extends Activity{
 		this.process = process;
 		stdin = process.getOutputStream();
 		stdout = process.getInputStream();
+		stdoutBuffered = new BufferedReader(new InputStreamReader(stdout));
 		stderr = process.getErrorStream();
 	}
 

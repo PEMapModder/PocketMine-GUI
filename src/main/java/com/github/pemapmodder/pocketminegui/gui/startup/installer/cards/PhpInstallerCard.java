@@ -40,9 +40,11 @@ public class PhpInstallerCard extends Card{
 							"Please choose the PHP binaries to run with this server.",
 					"Binaries not found", JOptionPane.WARNING_MESSAGE);
 			while(true){
-				JFileChooser binChooser = new JFileChooser(new File(
-						System.getProperty("os.name").toLowerCase().contains("win") ?
-								System.getenv("ProgramFiles") : "/Applications"));
+				JFileChooser binChooser = new JFileChooser(
+//						new File(System.getProperty("os.name").toLowerCase().contains("win") ?
+//								System.getenv("ProgramFiles") : "/Applications")
+						activity.getSelectedHome()
+				);
 				binChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 				int ret = binChooser.showOpenDialog(activity);
 				if(ret != JFileChooser.APPROVE_OPTION){
@@ -51,6 +53,7 @@ public class PhpInstallerCard extends Card{
 				File phpBinaries = binChooser.getSelectedFile();
 				if(Utils.validatePhpBinaries(phpBinaries)){
 					activity.setPhpBinaries(phpBinaries);
+					activity.next();
 					break;
 				}
 				JOptionPane.showMessageDialog(activity, "Invalid PHP binaries! " +
