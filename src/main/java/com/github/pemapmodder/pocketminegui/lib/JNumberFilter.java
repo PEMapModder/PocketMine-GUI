@@ -24,12 +24,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 
 public class JNumberFilter extends PlainDocument{
-	@Getter protected String acceptedChars = null;
-	@Getter protected boolean negativeAccepted = false;
-
-	public JNumberFilter(){
-		acceptedChars = "0123456789";
-	}
+	@Getter private final static String ACCEPTED_CHARS = "0123456789";
+	@Getter private boolean negativeAccepted = false;
 
 	public JNumberFilter setNegativeAccepted(boolean negativeAccepted){
 		this.negativeAccepted = negativeAccepted;
@@ -42,7 +38,7 @@ public class JNumberFilter extends PlainDocument{
 			return;
 		}
 		for(int i = 0; i < str.length(); i++){
-			if(!acceptedChars.contains(String.valueOf(str.charAt(i)))){
+			if(!ACCEPTED_CHARS.contains(String.valueOf(str.charAt(i)))){
 				return;
 			}
 		}
