@@ -116,7 +116,7 @@ public class Utils{
 	}
 
 	public static OperatingSystem getOS(){
-		String os = System.getenv("os.name").toLowerCase();
+		String os = System.getProperty("os.name").toLowerCase();
 		if(os.contains("win")){
 			return WINDOWS;
 		}
