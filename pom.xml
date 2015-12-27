@@ -107,6 +107,7 @@
 						<exclude>src/test/resources/**</exclude>
 						<exclude>src/main/resources/**</exclude>
 						<exclude>PocketMine-MP/**</exclude>
+						<exclude>test/**</exclude>
 					</excludes>
 				</configuration>
 				<executions>

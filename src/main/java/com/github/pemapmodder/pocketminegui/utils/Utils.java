@@ -25,9 +25,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import static com.github.pemapmodder.pocketminegui.utils.Utils.OperatingSystem.*;
+import static com.github.pemapmodder.pocketminegui.utils.Utils.OperatingSystem.LINUX;
+import static com.github.pemapmodder.pocketminegui.utils.Utils.OperatingSystem.MAC;
+import static com.github.pemapmodder.pocketminegui.utils.Utils.OperatingSystem.WINDOWS;
 
 public class Utils{
+	private static OperatingSystem os = null;
+
 	public static interface InstallProgressReporter{
 		public void report(double fraction);
 		public void completed(File result);
@@ -116,30 +120,38 @@ public class Utils{
 	}
 
 	public static OperatingSystem getOS(){
-		String os = System.getProperty("os.name").toLowerCase();
-		if(os.contains("win")){
-			return WINDOWS;
+		if(os != null){
+			return os;
 		}
-		if(os.contains("mac")){
-			return MAC;
+		String osName = System.getProperty("os.name").toLowerCase();
+		if(osName.contains("win")){
+			return os = WINDOWS;
 		}
-		return LINUX;
+		if(osName.contains("mac")){
+			return os = MAC;
+		}
+		return os = LINUX;
 	}
 
 	public static boolean validatePhpBinaries(File phpBinaries){
-		try{
-			Process process = new ProcessBuilder(phpBinaries.getAbsolutePath(), "-v").start();
-			process.waitFor();
-			String output = new String(IOUtils.toByteArray(process.getInputStream()));
-			System.out.println(output);
-			return output.startsWith("PHP ") && output.contains("The PHP Group");
-		}catch(IOException e){
-			e.printStackTrace();
-			return false;
-		}catch(InterruptedException e){
-			e.printStackTrace();
-			return false;
+		String output = exec(phpBinaries.getAbsolutePath(), "-v");
+		if(output != null && (!output.startsWith("PHP ") || !output.contains("The PHP Group"))){
+			output = exec(phpBinaries.getAbsolutePath(), "-r",
+					"echo (extension_loaded(\"pthreads\") and extension_loaded(\"yaml\")) ? \"ok\" : \"ng\"");
+			return "ok".equals(output);
 		}
+		return false;
+	}
+
+	public static String exec(String... cmdLine){
+		try{
+			Process process = new ProcessBuilder(cmdLine).start();
+			process.waitFor();
+			return new String(IOUtils.toByteArray(process.getInputStream()));
+		}catch(IOException | InterruptedException e){
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public enum OperatingSystem{

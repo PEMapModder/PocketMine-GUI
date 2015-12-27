@@ -22,15 +22,29 @@ import com.github.pemapmodder.pocketminegui.gui.startup.installer.InstallServerA
 import com.github.pemapmodder.pocketminegui.lib.Activity;
 import com.github.pemapmodder.pocketminegui.utils.Utils;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
-public class ChooseServerActivity extends Activity{
+import static com.github.pemapmodder.pocketminegui.utils.Utils.OperatingSystem.WINDOWS;
+import static com.github.pemapmodder.pocketminegui.utils.Utils.exec;
+import static com.github.pemapmodder.pocketminegui.utils.Utils.validatePhpBinaries;
+import static javax.swing.JFileChooser.APPROVE_OPTION;
+import static javax.swing.JFileChooser.CANCEL_OPTION;
+import static javax.swing.JFileChooser.DIRECTORIES_ONLY;
+import static javax.swing.JFileChooser.ERROR_OPTION;
+import static javax.swing.JFileChooser.FILES_ONLY;
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
+import static javax.swing.JOptionPane.WARNING_MESSAGE;
+import static javax.swing.JOptionPane.showMessageDialog;
 
+public class ChooseServerActivity extends Activity{
 	public ChooseServerActivity(){
 		super("PocketMine-GUI");
 	}
@@ -54,46 +68,52 @@ public class ChooseServerActivity extends Activity{
 		@Override
 		public void actionPerformed(ActionEvent e){
 			JFileChooser chooser = new JFileChooser(new File("."));
-			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			chooser.setFileSelectionMode(DIRECTORIES_ONLY);
 			int ret = chooser.showOpenDialog(ChooseServerActivity.this);
-			if(ret == JFileChooser.CANCEL_OPTION || ret == JFileChooser.ERROR_OPTION){
+			if(ret == CANCEL_OPTION || ret == ERROR_OPTION){
 				return;
 			}
 			File home = chooser.getSelectedFile();
 			if(!home.isDirectory()){
-				JOptionPane.showMessageDialog(ChooseServerActivity.this, "Not a directory!",
-						"Invalid selection", JOptionPane.ERROR_MESSAGE);
+				showMessageDialog(ChooseServerActivity.this, "Not a directory!",
+						"Invalid selection", ERROR_MESSAGE);
 				return;
 			}
 			if(!new File(home, "PocketMine-MP.phar").isFile() && !new File(home, "src").isDirectory()){
-				JOptionPane.showMessageDialog(ChooseServerActivity.this, "Could not find a phar or " +
+				showMessageDialog(ChooseServerActivity.this, "Could not find a phar or " +
 						"source installation of PocketMine-MP in directory! " +
 						"Please click the \"Install server into new directory\" button if " +
-						"you wish to install a server there instead.", "Invalid selection", JOptionPane.ERROR_MESSAGE);
+						"you wish to install a server there instead.", "Invalid selection", ERROR_MESSAGE);
 				return;
 			}
 			File phpBinaries = new File(home, "bin/php/php.exe");
 			if(!phpBinaries.isFile()){
 				phpBinaries = new File(home, "bin/php5/bin/php");
 				if(!phpBinaries.isFile()){
-					JOptionPane.showMessageDialog(ChooseServerActivity.this, "Could not autodetect PHP binaries. " +
-									"Please choose the PHP binaries to run with this server.",
-							"Binaries not found", JOptionPane.WARNING_MESSAGE);
-					while(true){
-						JFileChooser binChooser = new JFileChooser(new File(
-								System.getProperty("os.name").toLowerCase().contains("win") ?
-										System.getenv("ProgramFiles") : "/Applications"));
-						binChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-						ret = binChooser.showOpenDialog(ChooseServerActivity.this);
-						if(ret != JFileChooser.APPROVE_OPTION){
-							return;
+					String pathPhp = exec(Utils.getOS() == WINDOWS ? "where php" : "which php");
+					if(pathPhp != null){
+						phpBinaries = new File(pathPhp);
+						if(!phpBinaries.isFile() || !validatePhpBinaries(phpBinaries)){
+							showMessageDialog(ChooseServerActivity.this, "Could not autodetect PHP binaries. " +
+											"Please choose the PHP binaries to run with this server.",
+									"Binaries not found", WARNING_MESSAGE);
+							while(true){
+								JFileChooser binChooser = new JFileChooser(new File(
+										System.getProperty("os.name").toLowerCase().contains("win") ?
+												System.getenv("ProgramFiles") : "/Applications"));
+								binChooser.setFileSelectionMode(FILES_ONLY);
+								ret = binChooser.showOpenDialog(ChooseServerActivity.this);
+								if(ret != APPROVE_OPTION){
+									return;
+								}
+								phpBinaries = binChooser.getSelectedFile();
+								if(validatePhpBinaries(phpBinaries)){
+									break;
+								}
+								showMessageDialog(ChooseServerActivity.this, "Invalid PHP binaries! " +
+										"Please choose again.", "Invalid binaries", ERROR_MESSAGE);
+							}
 						}
-						phpBinaries = binChooser.getSelectedFile();
-						if(Utils.validatePhpBinaries(phpBinaries)){
-							break;
-						}
-						JOptionPane.showMessageDialog(ChooseServerActivity.this, "Invalid PHP binaries! " +
-								"Please choose again.", "Invalid binaries", JOptionPane.ERROR_MESSAGE);
 					}
 				}
 			}
