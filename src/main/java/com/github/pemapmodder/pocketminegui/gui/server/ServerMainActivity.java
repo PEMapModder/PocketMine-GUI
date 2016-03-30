@@ -31,7 +31,7 @@ public class ServerMainActivity extends Activity{
 	private Process process;
 	@Getter private OutputStream stdin;
 	@Getter private InputStream stdout, stderr;
-	@Getter private BufferedReader stdoutBuffered;
+	@Getter private BufferedReader stdoutBuffered, stderrBuffered;
 
 	@Getter private ServerState serverState = ServerState.STATE_STOPPED;
 	private File home;
@@ -71,13 +71,12 @@ public class ServerMainActivity extends Activity{
 	}
 
 	public boolean startServer(){
-		System.out.println("Starting");
 		if(serverState != ServerState.STATE_STOPPED){
 			return false;
 		}
 
 		try{
-			System.out.println(phpBinaries.getAbsolutePath() + pmEntry.getAbsolutePath());
+			System.err.println("Starting server: " + phpBinaries.getAbsolutePath() + " " + pmEntry.getAbsolutePath());
 			setProcess(new ProcessBuilder
 					(phpBinaries.getAbsolutePath(), pmEntry.getAbsolutePath())
 					.directory(home)
@@ -98,6 +97,7 @@ public class ServerMainActivity extends Activity{
 		stdout = process.getInputStream();
 		stdoutBuffered = new BufferedReader(new InputStreamReader(stdout));
 		stderr = process.getErrorStream();
+		stderrBuffered = new BufferedReader(new InputStreamReader(stderr));
 	}
 
 	@Override

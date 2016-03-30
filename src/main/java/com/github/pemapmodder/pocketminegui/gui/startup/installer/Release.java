@@ -25,13 +25,12 @@ import java.util.Date;
 
 @AllArgsConstructor
 public class Release{
-	public final static int LIST_STABLE = 0, LIST_BETA = 1, LIST_DEVELOPMENT = 2, LIST_BLEEDING = 3;
+	public final static int LIST_STABLE = 0, LIST_BETA = 1, LIST_DEVELOPMENT = 2, LIST_BLEEDING = 3, LIST_PMB = 4;
 
 	@Getter private String name;
 	@Getter private ReleaseType type;
 	@Getter private long publishTime;
 	@Getter private String pharUrl;
-	private String zipEntryName;
 
 	@Override
 	public String toString(){

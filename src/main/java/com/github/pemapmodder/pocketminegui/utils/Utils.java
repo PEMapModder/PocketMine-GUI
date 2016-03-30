@@ -69,7 +69,7 @@ public class Utils{
 				File out = new File(bin, "bin");
 				FileUtils.copyDirectory(out, new File(home, "bin"));
 				FileUtils.deleteDirectory(bin);
-				File output = new File(out, "php5/bin/php");
+				File output = new File(out, "php7/bin/php");
 				progress.completed(output);
 				return output;
 			}else{
@@ -135,9 +135,10 @@ public class Utils{
 
 	public static boolean validatePhpBinaries(File phpBinaries){
 		String output = exec(phpBinaries.getAbsolutePath(), "-v");
-		if(output != null && (!output.startsWith("PHP ") || !output.contains("The PHP Group"))){
+		if(output != null && output.startsWith("PHP ") && output.contains("The PHP Group") && output.contains("(cli)")){
+			String version = output.substring(4, output.indexOf(" (cli)"));
 			output = exec(phpBinaries.getAbsolutePath(), "-r",
-					"echo (extension_loaded(\"pthreads\") and extension_loaded(\"yaml\")) ? \"ok\" : \"ng\"");
+					"echo (extension_loaded(\"pthreads\") and extension_loaded(\"yaml\")) ? \"ok\" : \"ng\";");
 			return "ok".equals(output);
 		}
 		return false;

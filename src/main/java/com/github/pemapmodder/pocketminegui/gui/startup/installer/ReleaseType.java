@@ -25,7 +25,8 @@ public enum ReleaseType{
 	STABLE("Stable", Release.LIST_STABLE, KeyEvent.VK_S),
 	BETA("Beta", Release.LIST_BETA, KeyEvent.VK_B),
 	DEVELOPMENT("Deveopment", Release.LIST_DEVELOPMENT, KeyEvent.VK_D),
-	BLEEDING("Bleeding", Release.LIST_BLEEDING, KeyEvent.VK_L);
+	BLEEDING("Bleeding", Release.LIST_BLEEDING, KeyEvent.VK_L),
+	PMB("pmt.mcpe.me/pmb", Release.LIST_PMB, KeyEvent.VK_P);
 
 	@Getter private final String name;
 	@Getter private final int mnemonic;

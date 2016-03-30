@@ -22,10 +22,7 @@ import com.github.pemapmodder.pocketminegui.gui.startup.installer.InstallServerA
 import com.github.pemapmodder.pocketminegui.lib.Activity;
 import com.github.pemapmodder.pocketminegui.utils.Utils;
 
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -53,7 +50,8 @@ public class ChooseServerActivity extends Activity{
 	protected void onStart(){
 		setLayout(new GridLayout(3, 1));
 		JLabel titleLabel = new JLabel("PocketMine-GUI");
-		titleLabel.setFont(new Font("Helvetica", Font.BOLD, 12));
+		titleLabel.setFont(new Font("Helvetica", Font.BOLD, 24));
+		titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
 		titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		add(titleLabel);
 		JButton chooseServer = new JButton("Choose server directory");

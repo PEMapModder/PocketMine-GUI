@@ -50,6 +50,7 @@ public class FetchVersionsThread extends Thread{
 		fetchGitHubReleases();
 		fetchJenkinsBuilds("http://jenkins.pocketmine.net/job/PocketMine-MP/api/json?depth=1", "dev", ReleaseType.DEVELOPMENT);
 		fetchJenkinsBuilds("http://jenkins.pocketmine.net/job/PocketMine-MP-Bleeding/api/json?depth=1", "bleeding", ReleaseType.BLEEDING);
+		fetchPmbBuilds();
 		done = true;
 	}
 
@@ -76,7 +77,7 @@ public class FetchVersionsThread extends Thread{
 						jo.getString("tag_name"),
 						jo.getBoolean("prerelease") ? ReleaseType.BETA : ReleaseType.STABLE,
 						date.parse(jo.getString("published_at")).getTime(),
-						pharUrl, null
+						pharUrl
 				);
 				synchronized(releases){
 					releases.add(release);
@@ -115,7 +116,7 @@ public class FetchVersionsThread extends Thread{
 						buildPrefix + "-" + build.getInt("number"),
 						releaseType,
 						build.getLong("timestamp"),
-						build.getString("url") + "artifact/" + artifactName, null
+						build.getString("url") + "artifact/" + artifactName
 				);
 				synchronized(releases){
 					releases.add(release);
@@ -124,9 +125,47 @@ public class FetchVersionsThread extends Thread{
 		}catch(MalformedURLException e){
 			e.printStackTrace();
 		}catch(IOException | JSONException | NullPointerException | ClassCastException e){
-			System.err.println("Jenkins API returned invalid value!");
+			if(e.getMessage().startsWith("Server returned HTTP response code: 521")){
+				System.err.println("Jenkins server is down!");
+				return;
+			}
+			System.err.println("Jenkins API returned invalid value, resulting in this error: ");
 			e.printStackTrace();
 		}
 	}
 
+	public final static int PMB_TYPE_MASTER = 0;
+	public final static int PMB_TYPE_BRANCH = 1;
+	public final static int PMB_TYPE_PR = 2;
+
+	private void fetchPmbBuilds(){
+		try{
+			URL url = new URL("http://pmt.mcpe.me/pmb/versions.php");
+			String source = IOUtils.toString(url);
+			JSONObject object = new JSONObject(source);
+			JSONArray versions = object.getJSONArray("versions");
+			for(Object obj : versions){
+				JSONObject version = (JSONObject) obj;
+				String branch = version.getString("branch");
+				int type = version.getInt("buildType");
+				String name;
+				if(type == PMB_TYPE_MASTER){
+					name = "Latest development build";
+				}else if(type == PMB_TYPE_BRANCH){
+					name = "Unstable build for branch " + branch;
+				}else if(type == PMB_TYPE_PR){
+					name = "Unverified build for pull request #" + version.getInt("id") + " by @" + version.getString("actor");
+				}else{
+					throw new UnsupportedOperationException("Unknown build type " + type);
+				}
+				Release release = new Release(name, ReleaseType.PMB, version.getLong("time") * 1000,
+						"http://pmt.mcpe.me/pmb/dl/" + branch + ".phar");
+				synchronized(releases){
+					releases.add(release);
+				}
+			}
+		}catch(IOException | ClassCastException e){
+			e.printStackTrace();
+		}
+	}
 }

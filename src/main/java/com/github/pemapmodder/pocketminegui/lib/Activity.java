@@ -20,7 +20,10 @@ package com.github.pemapmodder.pocketminegui.lib;
 import com.github.pemapmodder.pocketminegui.PocketMineGUI;
 import lombok.Getter;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.Border;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -51,10 +54,17 @@ public abstract class Activity extends JFrame{
 		}
 		addWindowListener(new InternalWindowListener());
 		setLocationRelativeTo(null);
+		JPanel panel = new JPanel();
+		panel.setBorder(getBorder());
+		setContentPane(panel);
 		onStart();
 		pack();
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setVisible(true);
+	}
+
+	protected Border getBorder(){
+		return BorderFactory.createEmptyBorder(50, 50, 50, 50);
 	}
 
 	protected void onStart(){

@@ -43,12 +43,24 @@ public class ConsolePanel extends JPanel{
 	}
 
 	private void updateConsole(){
-		BufferedReader reader = activity.getStdoutBuffered();
-		if(reader == null){
+		BufferedReader stdout = activity.getStdoutBuffered();
+		BufferedReader stderr = activity.getStderrBuffered();
+		if(stdout == null){
 			return;
 		}
 		try{
-			System.out.println(reader.readLine());
+			String line = stdout.readLine();
+			if(line != null){
+				System.out.println(line);
+			}
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		try{
+			String line = stderr.readLine();
+			if(line != null){
+				System.out.println(line);
+			}
 		}catch(IOException e){
 			e.printStackTrace();
 		}
