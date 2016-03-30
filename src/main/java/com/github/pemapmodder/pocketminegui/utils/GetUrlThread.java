@@ -21,14 +21,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.ByteBuffer;
 
 public class GetUrlThread extends AsyncTask{
-	private final static int STEP = 1024;
+	private final static int STEP = 512;
 
 	private final URL url;
 
-	public ByteBuffer bb;
+	public byte[] array;
 
 	public GetUrlThread(URL url){
 		this.url = url;
@@ -37,20 +36,40 @@ public class GetUrlThread extends AsyncTask{
 	@Override
 	public void run(){
 		try{
-			System.out.println("Downloading: " + url);
 			URLConnection conn = url.openConnection();
-			InputStream is = conn.getInputStream();
 			setMax(conn.getContentLength());
-			bb = ByteBuffer.allocate(getMax());
-			for(setProgress(0); true; setProgress(Math.min(getProgress() + STEP, getMax()))){
-				byte[] buffer = new byte[STEP];
-				int len = is.read(buffer);
-				if(len == -1){
-					break;
+			array = new byte[getMax()];
+			try(InputStream is = conn.getInputStream()){
+				int progress = 0;
+				int step = 0;
+				int pointer = 0;
+				while(true){
+					byte[] buffer = new byte[STEP];
+					int read = is.read(buffer);
+					if(read == -1){
+						setProgress(getMax());
+						return;
+					}
+//					System.out.println(buffer.length + ", " + array.length + ", " + (step * STEP) + ", " + read);
+					System.arraycopy(buffer, 0, array, pointer, read);
+					pointer += read;
+					setProgress(progress += STEP);
+					step++;
 				}
-				bb.put(buffer, 0, len);
 			}
-			is.close();
+//			URLConnection conn = url.openConnection();
+//			InputStream is = conn.getInputStream();
+//			setMax(conn.getContentLength());
+//			bb = ByteBuffer.allocate(getMax());
+//			for(setProgress(0); true; setProgress(Math.min(getProgress() + STEP, getMax()))){
+//				byte[] buffer = new byte[STEP];
+//				int len = is.read(buffer);
+//				if(len == -1){
+//					break;
+//				}
+//				bb.put(buffer, 0, len);
+//			}
+//			is.close();
 		}catch(IOException e){
 			e.printStackTrace();
 		}

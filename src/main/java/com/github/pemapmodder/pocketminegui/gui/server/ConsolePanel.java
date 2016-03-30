@@ -17,52 +17,78 @@ package com.github.pemapmodder.pocketminegui.gui.server;
  * along with PocketMine-GUI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.Timer;
+import com.github.pemapmodder.pocketminegui.utils.NonBlockingBufferedReader;
+import com.github.pemapmodder.pocketminegui.utils.Ring;
+import com.github.pemapmodder.pocketminegui.utils.TerminalCode;
+import org.apache.commons.lang3.StringUtils;
+
+import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Element;
+import javax.swing.text.html.HTMLDocument;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.io.BufferedReader;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.io.IOException;
 
 public class ConsolePanel extends JPanel{
+	private final static int BUFFER_SIZE = 100;
 	private final ServerMainActivity activity;
-	private final JTextArea stdout;
+	private final JLabel title;
+	private final JEditorPane stdout;
+	private final HTMLDocument doc;
+	private final Element para;
+	private final Ring<String> consoleBuffer = new Ring<>(new String[BUFFER_SIZE]);
 
 	public ConsolePanel(ServerMainActivity activity){
 		this.activity = activity;
-		stdout = new JTextArea();
-		stdout.setEditable(false);
-		// people NEED to see this to feel happy
-		stdout.setForeground(Color.WHITE);
-		stdout.setBackground(Color.BLACK);
-		stdout.setPreferredSize(new Dimension(getWidth(), getHeight()));
-		add(stdout);
-		Timer timer = new Timer(100, e -> updateConsole());
+		setLayout(new GridBagLayout());
+		setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
+		title = new JLabel("PocketMine-MP");
+		GridBagConstraints c = new GridBagConstraints();
+		c.anchor = GridBagConstraints.CENTER;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weighty = 0.1;
+		add(title, c);
+		stdout = new JEditorPane();
+		stdout.setContentType("text/html");
+		stdout.setText("<html><body style='font-family: monospace; color: #FFFFFF;'><p id='p'></p></body></html>");
+		doc = (HTMLDocument) stdout.getDocument();
+		para = doc.getElement("p");
+//		stdout.setEditable(false);
+		// People NEED to see this to feel happy
+		stdout.setForeground(Color.GREEN);
+		stdout.setBackground(Color.RED);
+		stdout.setBorder(BorderFactory.createDashedBorder(new Color(0x80, 0x80, 0x80)));
+		c.gridy = 1;
+		c.weightx = 0.9;
+		c.weighty = 0.9;
+		c.weighty = 0.6;
+		c.fill = GridBagConstraints.BOTH;
+		c.anchor = GridBagConstraints.NORTH;
+		add(stdout, c);
+		Timer timer = new Timer(1000, e -> updateConsole());
 		timer.start();
+		consoleBuffer.add("Console");
 	}
 
 	private void updateConsole(){
-		BufferedReader stdout = activity.getStdoutBuffered();
-		BufferedReader stderr = activity.getStderrBuffered();
-		if(stdout == null){
+		NonBlockingBufferedReader reader = activity.getStdoutBuffered();
+		if(reader == null){
 			return;
 		}
-		try{
-			String line = stdout.readLine();
-			if(line != null){
-				System.out.println(line);
+		String line;
+		while((line = reader.readLine()) != null){
+			line = TerminalCode.toHTML(line);
+			System.out.println(line);
+			String text = stdout.getText();
+			consoleBuffer.add(line);
+
+			try{
+				doc.setInnerHTML(para, StringUtils.join(consoleBuffer, "<br>"));
+			}catch(BadLocationException | IOException e){
+				e.printStackTrace();
 			}
-		}catch(IOException e){
-			e.printStackTrace();
-		}
-		try{
-			String line = stderr.readLine();
-			if(line != null){
-				System.out.println(line);
-			}
-		}catch(IOException e){
-			e.printStackTrace();
 		}
 	}
 }

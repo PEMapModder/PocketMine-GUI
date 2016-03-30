@@ -154,7 +154,7 @@ public class FetchVersionsThread extends Thread{
 				}else if(type == PMB_TYPE_BRANCH){
 					name = "Unstable build for branch " + branch;
 				}else if(type == PMB_TYPE_PR){
-					name = "Unverified build for pull request #" + version.getInt("id") + " by @" + version.getString("actor");
+					name = "Unverified build for pull request #" + version.getInt("id") + " by @" + version.getString("actor") + ": " + version.getString("title");
 				}else{
 					throw new UnsupportedOperationException("Unknown build type " + type);
 				}

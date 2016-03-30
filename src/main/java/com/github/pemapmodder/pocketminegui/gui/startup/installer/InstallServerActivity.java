@@ -31,7 +31,6 @@ import java.io.File;
 public class InstallServerActivity extends CardActivity{
 	@Getter private File selectedHome;
 	@Getter @Setter private File phpBinaries;
-
 	@Getter @Setter private Release selectedRelease;
 
 	public InstallServerActivity(Activity parent){

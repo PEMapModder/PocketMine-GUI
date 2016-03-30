@@ -64,12 +64,15 @@ public class PhpInstallerCard extends Card{
 		});
 		add(positive);
 		JButton negative = new JButton("No, install it for me");
-		negative.addActionListener(e -> startInstallation());
+		negative.addActionListener(e -> {
+			positive.setEnabled(false);
+			negative.setEnabled(false);
+			startInstallation();
+		});
 		add(negative);
 		progressBar = new JProgressBar(0, 100);
-		progressBar.setVisible(false);
 		add(progressBar);
-		activity.getNextButton().setEnabled(false);
+		progressBar.setVisible(false);
 	}
 
 	private void startInstallation(){
@@ -96,15 +99,21 @@ public class PhpInstallerCard extends Card{
 
 	@Override
 	public void onEntry(){
+		activity.getNextButton().setEnabled(false);
 		File home = activity.getSelectedHome();
-		File[] fallback = {
-				new File("php")
-		};
-		for(File file : fallback){
-			if(file.isFile()){
-
+		String[] paths = System.getProperty("java.library.path").split(";");
+		for(String path : paths){
+			File file = new File(path, Utils.getOS() == Utils.OperatingSystem.WINDOWS ? "php.exe" : "php");
+			if(file.isFile() && Utils.validatePhpBinaries(file)){
+				activity.setPhpBinaries(file);
 			}
 		}
+	}
+
+	@Override
+	public boolean onExit(int type){
+		activity.getNextButton().setEnabled(true);
+		return true;
 	}
 
 	@Override

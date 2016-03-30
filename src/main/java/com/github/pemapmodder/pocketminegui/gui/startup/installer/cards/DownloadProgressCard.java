@@ -69,7 +69,7 @@ public class DownloadProgressCard extends Card{
 						Math.round(thread.getMax() / 102.4) / 10.0 + "KB");
 				if(thread.getMax() == thread.getProgress()){
 					progressCheck.stop();
-					byte[] data = thread.bb.array();
+					byte[] data = thread.array;
 					File home = activity.getSelectedHome();
 					try{
 						if(!home.mkdirs()){

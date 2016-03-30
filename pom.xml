@@ -59,6 +59,13 @@
 			<artifactId>commons-compress</artifactId>
 			<version>1.10</version>
 		</dependency>
+		<!-- apache commons collections -->
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>3.2.2</version>
+		</dependency>
+
 		<!-- org.json -->
 		<dependency>
 			<groupId>org.json</groupId>
