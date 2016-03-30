@@ -17,10 +17,14 @@ package com.github.pemapmodder.pocketminegui.utils;
  * along with PocketMine-GUI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -91,29 +95,29 @@ public class Utils{
 	}
 
 	private static File installWindowsPHP(File home, InstallProgressReporter progress){
-		File bin = new File(home, ".pmgui_tmp_pm_windows_installer");
-		bin.mkdirs();
 		progress.report(0.0);
 		try{
-			URL url = new URL("https", "github.com", "PocketMine/PocketMine-MP/releases/download/1.4.1dev-936/PocketMine-MP_Installer_1.4.1dev-936_x86.exe");
-			File installerFile = new File(bin, "installer.exe");
-			FileUtils.copyURLToFile(url, installerFile);
-			progress.report(0.33);
-			Process installer = new ProcessBuilder("installer.exe").directory(bin).start();
-			installer.waitFor();
-			progress.report(0.67);
-			File out = new File(home, "bin");
-			FileUtils.copyDirectory(new File(bin, "bin"), out);
-			FileUtils.deleteDirectory(bin);
-			File output = new File(out, "php/php.exe");
+			String link = System.getProperty("os.arch").contains("64") ? "https://bintray.com/artifact/download/pocketmine/PocketMine/PHP_7.0.3_x64_Windows.tar.gz" : "https://bintray.com/artifact/download/pocketmine/PocketMine/PHP_7.0.3_x86_Windows.tar.gz";
+			URL url = new URL(link);
+			InputStream gz = url.openStream();
+			GzipCompressorInputStream tar = new GzipCompressorInputStream(gz);
+			TarArchiveInputStream is = new TarArchiveInputStream(tar);
+			TarArchiveEntry entry;
+			while((entry = is.getNextTarEntry()) != null){
+				if(!entry.isDirectory()){
+					String name = entry.getName();
+					byte[] buffer = new byte[(int) entry.getSize()];
+					IOUtils.read(is, buffer);
+					File real = new File(home, name);
+					real.getParentFile().mkdirs();
+					IOUtils.write(buffer, new FileOutputStream(real));
+				}
+			}
+			File output = new File(home, "bin/php/php.exe");
 			progress.completed(output);
 			return output;
-		}catch(IOException | InterruptedException e){
+		}catch(IOException e){
 			e.printStackTrace();
-			try{
-				FileUtils.deleteDirectory(bin);
-			}catch(IOException e1){
-			}
 			progress.errored();
 			return null;
 		}

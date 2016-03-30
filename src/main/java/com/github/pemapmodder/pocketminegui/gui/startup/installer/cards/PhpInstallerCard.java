@@ -29,6 +29,8 @@ import java.io.File;
 public class PhpInstallerCard extends Card{
 	private final InstallServerActivity activity;
 	private final JProgressBar progressBar;
+	private Timer timer;
+	private InstallPHPThread thread;
 
 	public PhpInstallerCard(InstallServerActivity activity){
 		this.activity = activity;
@@ -36,9 +38,9 @@ public class PhpInstallerCard extends Card{
 		add(new JLabel("Do you have PHP binaries on your computer?"));
 		JButton positive = new JButton("Yes, let me point it to you");
 		positive.addActionListener(e -> {
-			JOptionPane.showMessageDialog(activity, "Could not autodetect PHP binaries. " +
-							"Please choose the PHP binaries to run with this server.",
-					"Binaries not found", JOptionPane.WARNING_MESSAGE);
+//			JOptionPane.showMessageDialog(activity, "Could not autodetect PHP binaries. " +
+//							"Please choose the PHP binaries to run with this server.",
+//					"Binaries not found", JOptionPane.WARNING_MESSAGE);
 			while(true){
 				JFileChooser binChooser = new JFileChooser(
 //						new File(System.getProperty("os.name").toLowerCase().contains("win") ?
@@ -67,25 +69,29 @@ public class PhpInstallerCard extends Card{
 		progressBar = new JProgressBar(0, 100);
 		progressBar.setVisible(false);
 		add(progressBar);
+		activity.getNextButton().setEnabled(false);
 	}
 
 	private void startInstallation(){
-		InstallPHPThread thread = new InstallPHPThread(activity.getSelectedHome());
-		Timer timer = new Timer(100, e -> {
-			if(thread.isInitialized()){
-				progressBar.setValue(thread.getProgress());
-				if(thread.getProgress() == thread.getMax()){
-					File php = thread.getResult();
-					if(php != null){
-						activity.setPhpBinaries(php);
-					}
-					activity.next();
-				}
-			}
-		});
+		thread = new InstallPHPThread(activity.getSelectedHome());
+		timer = new Timer(500, e -> onTimerTick());
 		timer.start();
 		thread.start();
 		progressBar.setVisible(true);
+	}
+
+	private void onTimerTick(){
+		if(thread.isInitialized()){
+			progressBar.setValue(thread.getProgress());
+			if(thread.getProgress() == thread.getMax()){
+				File php = thread.getResult();
+				if(php != null){
+					activity.setPhpBinaries(php);
+				}
+				timer.stop();
+				activity.next();
+			}
+		}
 	}
 
 	@Override
