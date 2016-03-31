@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
+import javax.swing.text.Style;
 import javax.swing.text.html.HTMLDocument;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
@@ -55,10 +56,14 @@ public class ConsolePanel extends JPanel{
 		stdout.setText("<html><body style='font-family: monospace; color: #FFFFFF;'><p id='p'></p></body></html>");
 		doc = (HTMLDocument) stdout.getDocument();
 		para = doc.getElement("p");
-//		stdout.setEditable(false);
+		stdout.setEditable(false);
 		// People NEED to see this to feel happy
-		stdout.setForeground(Color.GREEN);
-		stdout.setBackground(Color.RED);
+		stdout.setForeground(Color.WHITE);
+		stdout.setBackground(Color.BLACK);
+		Style style = doc.getStyleSheet().addStyle(null, null);
+//		style.addAttribute(StyleConstants.Foreground, Color.WHITE);
+//		style.addAttribute(StyleConstants.Background, Color.RED);
+		doc.setParagraphAttributes(para.getStartOffset(), 1, style, true);
 		stdout.setBorder(BorderFactory.createDashedBorder(new Color(0x80, 0x80, 0x80)));
 		c.gridy = 1;
 		c.weightx = 0.9;
@@ -69,7 +74,6 @@ public class ConsolePanel extends JPanel{
 		add(stdout, c);
 		Timer timer = new Timer(1000, e -> updateConsole());
 		timer.start();
-		consoleBuffer.add("Console");
 	}
 
 	private void updateConsole(){
