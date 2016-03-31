@@ -45,7 +45,7 @@ public enum TerminalCode{
 
 	private String ansi, html;
 
-	String replace(String src){
+	private String replace(String src){
 		return src.replace(ansi, "</font>" + html);
 	}
 
@@ -54,5 +54,12 @@ public enum TerminalCode{
 			ansi = code.replace(ansi);
 		}
 		return "<font>" + ansi + "</font>";
+	}
+
+	public static String clean(String ansi){
+		for(TerminalCode code : values()){
+			ansi = ansi.replace(ansi, "");
+		}
+		return ansi;
 	}
 }

@@ -17,7 +17,7 @@ package com.github.pemapmodder.pocketminegui.gui.server;
  * along with PocketMine-GUI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import com.github.pemapmodder.pocketminegui.utils.NonBlockingBufferedReader;
+import com.github.pemapmodder.pocketminegui.utils.NonBlockingANSIReader;
 import com.github.pemapmodder.pocketminegui.utils.Ring;
 import com.github.pemapmodder.pocketminegui.utils.TerminalCode;
 import org.apache.commons.lang3.StringUtils;
@@ -56,7 +56,7 @@ public class ConsolePanel extends JPanel{
 		stdout.setText("<html><body style='font-family: monospace; color: #FFFFFF;'><p id='p'></p></body></html>");
 		doc = (HTMLDocument) stdout.getDocument();
 		para = doc.getElement("p");
-		stdout.setEditable(false);
+//		stdout.setEditable(false);
 		// People NEED to see this to feel happy
 		stdout.setForeground(Color.WHITE);
 		stdout.setBackground(Color.BLACK);
@@ -72,19 +72,23 @@ public class ConsolePanel extends JPanel{
 		c.fill = GridBagConstraints.BOTH;
 		c.anchor = GridBagConstraints.NORTH;
 		add(stdout, c);
-		Timer timer = new Timer(1000, e -> updateConsole());
+		Timer timer = new Timer(50, e -> updateConsole());
 		timer.start();
 	}
 
 	private void updateConsole(){
-		NonBlockingBufferedReader reader = activity.getStdoutBuffered();
+		NonBlockingANSIReader reader = activity.getStdoutBuffered();
 		if(reader == null){
 			return;
 		}
-		String line;
-		while((line = reader.readLine()) != null){
-			line = TerminalCode.toHTML(line);
-			System.out.println(line);
+		NonBlockingANSIReader.Entry entry;
+		while((entry = reader.nextOutput()) != null){
+			if(entry.getType() == NonBlockingANSIReader.EntryType.TITLE){
+				title.setText(entry.getLine());
+				continue;
+			}
+			String line = TerminalCode.toHTML(entry.getLine());
+//			System.out.println(line);
 			String text = stdout.getText();
 			consoleBuffer.add(line);
 
@@ -93,6 +97,9 @@ public class ConsolePanel extends JPanel{
 			}catch(BadLocationException | IOException e){
 				e.printStackTrace();
 			}
+
+			String clean = TerminalCode.clean(entry.getLine());
+
 		}
 	}
 }

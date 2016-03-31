@@ -18,7 +18,7 @@ package com.github.pemapmodder.pocketminegui.gui.server;
  */
 
 import com.github.pemapmodder.pocketminegui.lib.Activity;
-import com.github.pemapmodder.pocketminegui.utils.NonBlockingBufferedReader;
+import com.github.pemapmodder.pocketminegui.utils.NonBlockingANSIReader;
 import lombok.Getter;
 
 import javax.swing.JButton;
@@ -27,15 +27,19 @@ import javax.swing.JMenuBar;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.KeyEvent;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class ServerMainActivity extends Activity{
 	private Process process;
 	@Getter private OutputStream stdin;
 	@Getter private InputStream stdout;
-	@Getter private NonBlockingBufferedReader stdoutBuffered;
+	@Getter private NonBlockingANSIReader stdoutBuffered;
 
-	@Getter private ServerState serverState = ServerState.STATE_STOPPED;
+	//	@Getter private ServerState serverState = ServerState.STATE_STOPPED;
+	@Getter private ServerLifetime lifetime;
 	private File home;
 
 	private File phpBinaries, pmEntry;
@@ -57,6 +61,8 @@ public class ServerMainActivity extends Activity{
 
 	@Override
 	protected void onStart(){
+		lifetime = new ServerLifetime(this);
+
 //		setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 		setLayout(new GridBagLayout());
 		JMenuBar bar = new JMenuBar();
@@ -69,7 +75,7 @@ public class ServerMainActivity extends Activity{
 		setJMenuBar(bar);
 
 		startStopButton = new JButton("Start");
-		startStopButton.addActionListener(e -> startServer());
+		startStopButton.addActionListener(lifetime::listen);
 		GridBagConstraints constr = new GridBagConstraints();
 		constr.gridx = 0;
 		constr.gridy = 0;
@@ -85,11 +91,7 @@ public class ServerMainActivity extends Activity{
 		add(consolePanel = new ConsolePanel(this), constr);
 	}
 
-	public boolean startServer(){
-		if(serverState != ServerState.STATE_STOPPED){
-			return false;
-		}
-
+	boolean startServer(){
 		try{
 			System.err.println("Starting server: " + phpBinaries.getAbsolutePath() + " " + pmEntry.getAbsolutePath());
 			setProcess(new ProcessBuilder
@@ -97,10 +99,6 @@ public class ServerMainActivity extends Activity{
 					.directory(home)
 					.redirectErrorStream(true)
 					.start());
-
-			serverState = ServerState.STATE_STARTING;
-			startStopButton.setEnabled(false);
-			startStopButton.setText(serverState.getState());
 		}catch(IOException e){
 			e.printStackTrace();
 		}
@@ -111,7 +109,7 @@ public class ServerMainActivity extends Activity{
 		this.process = process;
 		stdin = process.getOutputStream();
 		stdout = process.getInputStream();
-		stdoutBuffered = new NonBlockingBufferedReader(new BufferedReader(new InputStreamReader(stdout)));
+		stdoutBuffered = new NonBlockingANSIReader(stdout);
 		stdoutBuffered.start();
 	}
 
@@ -122,15 +120,15 @@ public class ServerMainActivity extends Activity{
 	}
 
 	public enum ServerState{
-		STATE_STOPPED("Stopped"),
+		STATE_STOPPED("Start"),
 		STATE_STARTING("Starting..."),
-		STATE_RUNNING("Running"),
+		STATE_RUNNING("Stop"),
 		STATE_STOPPING("Stopping...");
 
-		@Getter private String state;
+		@Getter private String buttonName;
 
-		ServerState(String state){
-			this.state = state;
+		ServerState(String buttonName){
+			this.buttonName = buttonName;
 		}
 	}
 }
