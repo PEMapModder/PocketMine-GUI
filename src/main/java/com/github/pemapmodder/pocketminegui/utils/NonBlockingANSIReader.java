@@ -24,8 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 
-import static java.lang.System.lineSeparator;
-
 @RequiredArgsConstructor
 public class NonBlockingANSIReader extends Thread{
 	@Getter private final InputStream input;
@@ -71,13 +69,14 @@ public class NonBlockingANSIReader extends Thread{
 	}
 
 	private char[] getTerminatingChar(){
-		String title = "\u001B]0;";
+		String title = "\u001b]0;";
+		String pmgui = "\u001b]PMGUI;";
 		tmpEntryType = EntryType.CONSOLE;
-		if(buffer.length() < title.length()){
-			return lineSeparator().toCharArray();
-		}
-		if(buffer.substring(0, title.length()).equals(title)){
+		if(buffer.length() >= title.length() && buffer.substring(0, title.length()).equals(title)){
 			tmpEntryType = EntryType.TITLE;
+			return new char[]{'\u0007'};
+		}else if(buffer.length() >= pmgui.length() && buffer.substring(0, pmgui.length()).equals(pmgui)){
+			tmpEntryType = EntryType.PMGUI;
 			return new char[]{'\u0007'};
 		}
 		return System.lineSeparator().toCharArray();
@@ -109,7 +108,8 @@ public class NonBlockingANSIReader extends Thread{
 
 	public enum EntryType{
 		CONSOLE,
-		TITLE
+		TITLE,
+		PMGUI
 	}
 
 	public void close(){

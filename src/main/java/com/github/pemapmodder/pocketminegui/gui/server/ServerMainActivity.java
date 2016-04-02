@@ -20,6 +20,7 @@ package com.github.pemapmodder.pocketminegui.gui.server;
 import com.github.pemapmodder.pocketminegui.lib.Activity;
 import com.github.pemapmodder.pocketminegui.utils.NonBlockingANSIReader;
 import lombok.Getter;
+import org.apache.commons.io.IOUtils;
 
 import javax.swing.JButton;
 import javax.swing.JMenu;
@@ -27,13 +28,10 @@ import javax.swing.JMenuBar;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 public class ServerMainActivity extends Activity{
-	private Process process;
+	@Getter private Process process;
 	@Getter private OutputStream stdin;
 	@Getter private InputStream stdout;
 	@Getter private NonBlockingANSIReader stdoutBuffered;
@@ -56,6 +54,14 @@ public class ServerMainActivity extends Activity{
 			if(!pmEntry.isDirectory()){
 				throw new RuntimeException("No PocketMine entry detected");
 			}
+			pmEntry = new File(pmEntry, "pocketmine/PocketMine.php");
+		}
+		File pluginPath = new File(home, "plugins/.pmgui.adaptor.php");
+		pluginPath.getParentFile().mkdirs();
+		try{
+			IOUtils.copy(getClass().getClassLoader().getResourceAsStream("plugins/adaptor.php"), new FileOutputStream(pluginPath));
+		}catch(IOException e){
+			e.printStackTrace();
 		}
 	}
 
@@ -95,7 +101,8 @@ public class ServerMainActivity extends Activity{
 		try{
 			System.err.println("Starting server: " + phpBinaries.getAbsolutePath() + " " + pmEntry.getAbsolutePath());
 			setProcess(new ProcessBuilder
-					(phpBinaries.getAbsolutePath(), pmEntry.getAbsolutePath(), "--enable-ansi", "--disable-readline", "--disable-wizard")
+					(phpBinaries.getAbsolutePath(), pmEntry.getAbsolutePath(),
+							"--enable-ansi", "--disable-readline", "--disable-wizard", "--pmgui.enabled=1")
 					.directory(home)
 					.redirectErrorStream(true)
 					.start());

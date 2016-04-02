@@ -17,6 +17,7 @@ package com.github.pemapmodder.pocketminegui.utils;
  * along with PocketMine-GUI.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Iterator;
@@ -30,7 +31,7 @@ public class Ring<T> implements Iterable<T>{
 	/**
 	 * This is an internal offset
 	 */
-	private int size = 0;
+	@Getter private int size = 0;
 
 	public Ring(T[] buffer){
 		array = buffer.clone();
@@ -44,7 +45,7 @@ public class Ring<T> implements Iterable<T>{
 		}
 	}
 
-	public T get(int offset){
+	public T get(int offset) throws IndexOutOfBoundsException{
 		if(offset >= size){
 			throw new IndexOutOfBoundsException();
 		}

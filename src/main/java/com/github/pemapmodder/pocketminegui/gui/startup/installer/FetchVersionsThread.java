@@ -62,7 +62,7 @@ public class FetchVersionsThread extends Thread{
 			for(Object object : releasesArray){
 				JSONObject jo = (JSONObject) object;
 				DateFormat date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-				JSONArray assets = jo.getJSONArray("assets");
+				JSONArray assets = jo.getJSONArray("plugins");
 				String pharUrl = null;
 				for(Object asset : assets){
 					JSONObject assetObject = (JSONObject) asset;

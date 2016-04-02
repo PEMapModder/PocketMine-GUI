@@ -18,6 +18,7 @@ package com.github.pemapmodder.pocketminegui.utils;
  */
 
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 @AllArgsConstructor
 public enum TerminalCode{
@@ -50,15 +51,38 @@ public enum TerminalCode{
 	}
 
 	public static String toHTML(String ansi){
-		for(TerminalCode code : values()){
-			ansi = code.replace(ansi);
+//		for(TerminalCode code : values()){
+//			ansi = code.replace(ansi);
+//		}
+//		return "<font>" + ansi + "</font>";
+		StringBuilder output = new StringBuilder(ansi.length());
+		for(int i = 0; i < ansi.length(); ++i){
+			if(ansi.charAt(i) == '\u001b'){
+				TerminalCode code = startsWithCode(ansi.substring(i));
+				if(code != null){
+					i += code.ansi.length() // skip the ANSI code
+							- 1; // to cancel effect of ++i
+					output.append(code.html);
+					continue;
+				}
+			}
+			output.append(StringEscapeUtils.escapeHtml4(String.valueOf(ansi.charAt(i))));
 		}
-		return "<font>" + ansi + "</font>";
+		return output.toString();
+	}
+
+	public static TerminalCode startsWithCode(String ansi){
+		for(TerminalCode code : values()){
+			if(ansi.startsWith(code.ansi)){
+				return code;
+			}
+		}
+		return null;
 	}
 
 	public static String clean(String ansi){
 		for(TerminalCode code : values()){
-			ansi = ansi.replace(ansi, "");
+			ansi = ansi.replace(code.ansi, "");
 		}
 		return ansi;
 	}

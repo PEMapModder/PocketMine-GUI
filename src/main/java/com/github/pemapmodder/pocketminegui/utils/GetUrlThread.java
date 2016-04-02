@@ -50,26 +50,12 @@ public class GetUrlThread extends AsyncTask{
 						setProgress(getMax());
 						return;
 					}
-//					System.out.println(buffer.length + ", " + array.length + ", " + (step * STEP) + ", " + read);
 					System.arraycopy(buffer, 0, array, pointer, read);
 					pointer += read;
 					setProgress(progress += STEP);
 					step++;
 				}
 			}
-//			URLConnection conn = url.openConnection();
-//			InputStream is = conn.getInputStream();
-//			setMax(conn.getContentLength());
-//			bb = ByteBuffer.allocate(getMax());
-//			for(setProgress(0); true; setProgress(Math.min(getProgress() + STEP, getMax()))){
-//				byte[] buffer = new byte[STEP];
-//				int len = is.read(buffer);
-//				if(len == -1){
-//					break;
-//				}
-//				bb.put(buffer, 0, len);
-//			}
-//			is.close();
 		}catch(IOException e){
 			e.printStackTrace();
 		}

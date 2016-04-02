@@ -28,8 +28,11 @@ import javax.swing.text.Element;
 import javax.swing.text.Style;
 import javax.swing.text.html.HTMLDocument;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 public class ConsolePanel extends JPanel{
@@ -49,29 +52,47 @@ public class ConsolePanel extends JPanel{
 		GridBagConstraints c = new GridBagConstraints();
 		c.anchor = GridBagConstraints.CENTER;
 		c.fill = GridBagConstraints.HORIZONTAL;
-		c.weighty = 0.1;
+		c.weighty = 0.0;
 		add(title, c);
-		stdout = new JEditorPane();
+		stdout = new JEditorPane(){
+			@Override
+			public boolean getScrollableTracksViewportHeight(){
+				return true;
+			}
+
+			@Override
+			public boolean getScrollableTracksViewportWidth(){
+				return true;
+			}
+		};
 		stdout.setContentType("text/html");
-		stdout.setText("<html><body style='font-family: monospace; color: #FFFFFF;'><p id='p'></p></body></html>");
+		stdout.setText("<html><body style='color: #FFFFFF;'><p id='p' style='font-family: monospace;'><br><br><br><br>" +
+				"<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br></p></body></html>");
 		doc = (HTMLDocument) stdout.getDocument();
 		para = doc.getElement("p");
-//		stdout.setEditable(false);
+		JScrollPane scrollPane = new JScrollPane();
+		stdout.setEditable(false);
 		// People NEED to see this to feel happy
 		stdout.setForeground(Color.WHITE);
 		stdout.setBackground(Color.BLACK);
 		Style style = doc.getStyleSheet().addStyle(null, null);
-//		style.addAttribute(StyleConstants.Foreground, Color.WHITE);
-//		style.addAttribute(StyleConstants.Background, Color.RED);
 		doc.setParagraphAttributes(para.getStartOffset(), 1, style, true);
-		stdout.setBorder(BorderFactory.createDashedBorder(new Color(0x80, 0x80, 0x80)));
+		scrollPane.getViewport().add(stdout);
+		scrollPane.setMinimumSize(new Dimension(200, 200));
+		scrollPane.setPreferredSize(new Dimension(500, 400));
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		c.gridy = 1;
 		c.weightx = 0.9;
-		c.weighty = 0.9;
-		c.weighty = 0.6;
+		c.weighty = 0.0;
 		c.fill = GridBagConstraints.BOTH;
-		c.anchor = GridBagConstraints.NORTH;
-		add(stdout, c);
+		c.anchor = GridBagConstraints.NORTHWEST;
+		add(scrollPane, c);
+		JTextField stdin = new JTextField();
+		stdin.addKeyListener(new MyKeyAdapter(stdin, activity));
+		c.gridy = 2;
+		c.weighty = 0.0;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		add(stdin, c);
 		Timer timer = new Timer(50, e -> updateConsole());
 		timer.start();
 	}
@@ -87,8 +108,11 @@ public class ConsolePanel extends JPanel{
 				title.setText(entry.getLine());
 				continue;
 			}
+			if(entry.getType() == NonBlockingANSIReader.EntryType.PMGUI){
+				activity.getLifetime().handlePluginMessage(new InternalMessage(entry.getLine()));
+				continue;
+			}
 			String line = TerminalCode.toHTML(entry.getLine());
-//			System.out.println(line);
 			String text = stdout.getText();
 			consoleBuffer.add(line);
 
@@ -99,7 +123,65 @@ public class ConsolePanel extends JPanel{
 			}
 
 			String clean = TerminalCode.clean(entry.getLine());
+			activity.getLifetime().handleConsoleOutput(clean);
+		}
+	}
 
+	private static class MyKeyAdapter extends KeyAdapter{
+		private final JTextField stdin;
+		private final ServerMainActivity activity;
+		Ring<String> consoleLog = new Ring<>(new String[50]);
+		int neg = 0;
+		String tmpText = "";
+
+		public MyKeyAdapter(JTextField stdin, ServerMainActivity activity){
+			this.stdin = stdin;
+			this.activity = activity;
+		}
+
+		@Override
+		public void keyPressed(KeyEvent e){
+			String newText = null;
+			if(e.getKeyCode() == KeyEvent.VK_ENTER){
+				if(activity.getProcess() == null){
+					return;
+				}
+				try{
+					String line = stdin.getText();
+					activity.getStdin().write(line.concat(System.lineSeparator()).getBytes());
+					newText = "";
+					neg = 0;
+					consoleLog.add(line);
+				}catch(IOException e1){
+					e1.printStackTrace();
+					return;
+				}
+			}else if(e.getKeyCode() == KeyEvent.VK_UP || e.getKeyChar() == KeyEvent.VK_KP_UP){
+				++neg;
+				if(neg == 1){
+					tmpText = stdin.getText();
+				}
+				try{
+					newText = consoleLog.get(consoleLog.getSize() - neg);
+				}catch(IndexOutOfBoundsException e1){
+					--neg;
+					return;
+				}
+			}else if(e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_KP_DOWN){
+				if(neg <= 0){
+					neg = 0;
+					return;
+				}
+				--neg;
+				if(neg == 0){
+					newText = tmpText;
+				}else{
+					newText = consoleLog.get(consoleLog.getSize() - neg);
+				}
+			}
+			if(newText != null){
+				stdin.setText(newText);
+			}
 		}
 	}
 }
