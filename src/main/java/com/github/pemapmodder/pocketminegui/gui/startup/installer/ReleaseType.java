@@ -24,7 +24,7 @@ import java.awt.event.KeyEvent;
 public enum ReleaseType{
 	STABLE("Stable", Release.LIST_STABLE, KeyEvent.VK_S),
 	BETA("Beta", Release.LIST_BETA, KeyEvent.VK_E),
-	DEVELOPMENT("Deveopment", Release.LIST_DEVELOPMENT, KeyEvent.VK_D),
+	DEVELOPMENT("Development", Release.LIST_DEVELOPMENT, KeyEvent.VK_D),
 	BLEEDING("Bleeding", Release.LIST_BLEEDING, KeyEvent.VK_L),
 	PMB("pmt.mcpe.me/pmb", Release.LIST_PMB, KeyEvent.VK_P);
 
